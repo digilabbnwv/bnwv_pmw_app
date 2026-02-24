@@ -3,17 +3,11 @@ import { Notifications } from '@mantine/notifications'
 import { ModalsProvider } from '@mantine/modals'
 import LoginPage from './pages/LoginPage'
 import SetupTOTPPage from './pages/SetupTOTPPage'
+import DashboardPage from './pages/DashboardPage'
+import AllProjectsPage from './pages/AllProjectsPage'
+import SettingsPage from './pages/SettingsPage'
 import ProtectedRoute from './components/ProtectedRoute'
-import { Text, Container, Title } from '@mantine/core'
-
-function DashboardPlaceholder() {
-  return (
-    <Container size="sm" py="xl">
-      <Title order={1}>BNWV Projectbeheer</Title>
-      <Text mt="md">Dashboard wordt gebouwd.</Text>
-    </Container>
-  )
-}
+import AppShellLayout from './components/layout/AppShell'
 
 function App() {
   return (
@@ -27,10 +21,14 @@ function App() {
             path="/*"
             element={
               <ProtectedRoute>
-                <Routes>
-                  <Route path="/" element={<DashboardPlaceholder />} />
-                  <Route path="*" element={<Navigate to="/" replace />} />
-                </Routes>
+                <AppShellLayout>
+                  <Routes>
+                    <Route path="/" element={<DashboardPage />} />
+                    <Route path="/projects" element={<AllProjectsPage />} />
+                    <Route path="/settings" element={<SettingsPage />} />
+                    <Route path="*" element={<Navigate to="/" replace />} />
+                  </Routes>
+                </AppShellLayout>
               </ProtectedRoute>
             }
           />
