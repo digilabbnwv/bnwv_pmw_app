@@ -1,0 +1,15 @@
+{
+  "permissions": {
+    "allow": [
+      "Bash(/c/dev/bnwv_pmw_app/node_bin/node.exe:*)",
+      "Bash(/c/dev/bnwv_pmw_app/node_bin/npm.cmd --version)",
+      "Bash(export PATH:*)",
+      "Bash(npx --yes create-vite@latest . -- --template react)",
+      "Bash(npm install:*)",
+      "Bash(git init:*)",
+      "Bash(git checkout:*)",
+      "Bash(git add:*)",
+      "Bash(git commit:*)"
+    ]
+  }
+}
