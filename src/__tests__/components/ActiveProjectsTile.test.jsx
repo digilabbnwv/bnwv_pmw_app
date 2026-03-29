@@ -17,8 +17,8 @@ describe('ActiveProjectsTile', () => {
 
   it('shows active projects', () => {
     const projects = [
-      { id: '1', name: 'Project Alpha', status: 'In uitvoering', end_date: '2026-06-01' },
-      { id: '2', name: 'Project Beta', status: 'In opstart', end_date: null },
+      { id: '1', name: 'Project Alpha', status: 'In uitvoering', current_phase: 'realisatie', end_date: '2026-06-01' },
+      { id: '2', name: 'Project Beta', status: 'In opstart', current_phase: 'definitie', end_date: null },
     ]
     render(<ActiveProjectsTile projects={projects} />, { wrapper })
     expect(screen.getByText('Project Alpha')).toBeInTheDocument()
@@ -27,9 +27,9 @@ describe('ActiveProjectsTile', () => {
 
   it('excludes finished projects', () => {
     const projects = [
-      { id: '1', name: 'Actief', status: 'In uitvoering' },
-      { id: '2', name: 'Klaar', status: 'Afgerond' },
-      { id: '3', name: 'Archief', status: 'Gearchiveerd' },
+      { id: '1', name: 'Actief', status: 'In uitvoering', current_phase: 'realisatie' },
+      { id: '2', name: 'Klaar', status: 'Afgerond', current_phase: 'afgerond' },
+      { id: '3', name: 'Archief', status: 'Gearchiveerd', current_phase: 'afgerond' },
     ]
     render(<ActiveProjectsTile projects={projects} />, { wrapper })
     expect(screen.getByText('Actief')).toBeInTheDocument()
@@ -42,6 +42,7 @@ describe('ActiveProjectsTile', () => {
       id: String(i),
       name: `Project ${i}`,
       status: 'In uitvoering',
+      current_phase: 'realisatie',
     }))
     render(<ActiveProjectsTile projects={projects} />, { wrapper })
     expect(screen.getByText('Project 0')).toBeInTheDocument()

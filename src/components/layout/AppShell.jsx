@@ -5,12 +5,14 @@ import {
   ActionIcon,
   useMantineColorScheme,
   Burger,
+  Text,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconSun, IconMoon, IconLogout } from '@tabler/icons-react'
+import { IconSun, IconMoon, IconLogout, IconFolder } from '@tabler/icons-react'
 import { supabase } from '../../lib/supabaseClient'
 import { useNavigate } from 'react-router-dom'
 import Sidebar from './Sidebar'
+import NotificationBell from '../notifications/NotificationBell'
 
 export default function AppShellLayout({ children }) {
   const [opened, { toggle }] = useDisclosure()
@@ -25,16 +27,29 @@ export default function AppShellLayout({ children }) {
   return (
     <MantineAppShell
       header={{ height: 60 }}
-      navbar={{ width: 250, breakpoint: 'sm', collapsed: { mobile: !opened } }}
+      navbar={{ width: 260, breakpoint: 'sm', collapsed: { mobile: !opened } }}
       padding="md"
     >
       <MantineAppShell.Header>
         <Group h="100%" px="md" justify="space-between">
           <Group>
             <Burger opened={opened} onClick={toggle} hiddenFrom="sm" size="sm" />
-            <Title order={3}>Projectbeheer</Title>
+            <Group
+              gap="xs"
+              style={{ cursor: 'pointer' }}
+              onClick={() => navigate('/')}
+            >
+              <IconFolder size={24} color="var(--mantine-color-brand-5)" />
+              <Title order={3} style={{ letterSpacing: '-0.5px' }}>
+                PMW
+              </Title>
+              <Text c="dimmed" size="sm" visibleFrom="sm">
+                Projectmatig Werken
+              </Text>
+            </Group>
           </Group>
-          <Group>
+          <Group gap="sm">
+            <NotificationBell />
             <ActionIcon
               variant="default"
               size="lg"

@@ -1,4 +1,5 @@
 import { isExpiringSoon } from './dateUtils'
+import { getPhaseColor as phaseColor, getPhaseLabel, getPhaseIndex, PHASES } from './phaseConfig'
 
 const STATUS_COLORS = {
   'Niet gestart': 'gray',
@@ -9,30 +10,20 @@ const STATUS_COLORS = {
   Gearchiveerd: 'gray.4',
 }
 
-/**
- * Filtert projecten met status Afgerond en Gearchiveerd eruit.
- */
 export function getActiveProjects(projects) {
-  return projects.filter((p) => p.status !== 'Afgerond' && p.status !== 'Gearchiveerd')
+  return projects.filter(
+    (p) => p.status !== 'Afgerond' && p.status !== 'Gearchiveerd' && p.current_phase !== 'afgerond'
+  )
 }
 
-/**
- * Geeft de Mantine kleurstring voor een projectstatus.
- */
 export function getStatusColor(status) {
   return STATUS_COLORS[status] || 'gray'
 }
 
-/**
- * Geeft projecten waarvan end_date binnen het opgegeven aantal dagen valt.
- */
 export function getExpiringProjects(projects, days = 30) {
   return projects.filter((p) => isExpiringSoon(p.end_date, days))
 }
 
-/**
- * Telt projecten per status voor gebruik in een PieChart.
- */
 export function countByStatus(projects) {
   const counts = {}
   for (const p of projects) {
@@ -44,3 +35,21 @@ export function countByStatus(projects) {
     color: getStatusColor(name),
   }))
 }
+
+export function countByPhase(projects) {
+  const counts = {}
+  for (const p of projects) {
+    const phase = p.current_phase || 'initiatief'
+    const label = phase === 'afgerond' ? 'Afgerond' : getPhaseLabel(phase)
+    counts[label] = (counts[label] || 0) + 1
+  }
+  return Object.entries(counts).map(([name, value]) => ({
+    name,
+    value,
+    color: name === 'Afgerond' ? 'green' : phaseColor(
+      PHASES.find((p) => p.label === name)?.key || 'gray'
+    ),
+  }))
+}
+
+export { phaseColor as getProjectPhaseColor }

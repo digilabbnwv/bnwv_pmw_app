@@ -3,7 +3,6 @@ import {
   Title,
   TextInput,
   Textarea,
-  Select,
   Button,
   Group,
   Stack,
@@ -16,15 +15,7 @@ import { notifications } from '@mantine/notifications'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import { defaultEndDate } from '../lib/utils/dateUtils'
-
-const STATUS_OPTIONS = [
-  'Niet gestart',
-  'In opstart',
-  'In uitvoering',
-  'In afronding',
-  'Afgerond',
-  'Gearchiveerd',
-]
+import { PHASES } from '../lib/utils/phaseConfig'
 
 export default function ProjectFormPage() {
   const { id } = useParams()
@@ -36,7 +27,6 @@ export default function ProjectFormPage() {
   const [form, setForm] = useState({
     name: '',
     description: '',
-    status: 'Niet gestart',
     start_date: null,
     end_date: null,
     sharepoint_project_url: '',
@@ -51,7 +41,6 @@ export default function ProjectFormPage() {
         setForm({
           name: data.name || '',
           description: data.description || '',
-          status: data.status || 'Niet gestart',
           start_date: data.start_date ? new Date(data.start_date) : null,
           end_date: data.end_date ? new Date(data.end_date) : null,
           sharepoint_project_url: data.sharepoint_project_url || '',
@@ -83,7 +72,6 @@ export default function ProjectFormPage() {
     const payload = {
       name: form.name.trim(),
       description: form.description.trim() || null,
-      status: form.status,
       start_date: form.start_date ? new Date(form.start_date).toISOString().split('T')[0] : null,
       end_date: form.end_date ? new Date(form.end_date).toISOString().split('T')[0] : null,
       sharepoint_project_url: form.sharepoint_project_url.trim() || null,
@@ -109,6 +97,8 @@ export default function ProjectFormPage() {
         data: { user },
       } = await supabase.auth.getUser()
       payload.owner_id = user?.id
+      payload.status = 'In opstart'
+      payload.current_phase = 'initiatief'
 
       const { data, error } = await supabase.from('projects').insert(payload).select().single()
       if (error) {
@@ -121,7 +111,17 @@ export default function ProjectFormPage() {
         return
       }
 
-      // Create empty quality_checks record
+      // Create phase records for all 6 phases
+      const now = new Date().toISOString()
+      const phaseRecords = PHASES.map((phase, index) => ({
+        project_id: data.id,
+        phase: phase.key,
+        started_at: index === 0 ? now : null,
+      }))
+
+      await supabase.from('project_phases').insert(phaseRecords)
+
+      // Also create legacy quality_checks for backward compatibility
       await supabase.from('quality_checks').insert({ project_id: data.id })
 
       notifications.show({ title: 'Aangemaakt', message: 'Project aangemaakt.', color: 'green' })
@@ -162,13 +162,6 @@ export default function ProjectFormPage() {
               onChange={(e) =>
                 setForm((prev) => ({ ...prev, description: e.currentTarget.value }))
               }
-            />
-
-            <Select
-              label="Status"
-              data={STATUS_OPTIONS}
-              value={form.status}
-              onChange={(val) => setForm((prev) => ({ ...prev, status: val }))}
             />
 
             <Group grow>

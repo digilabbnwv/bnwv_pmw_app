@@ -1,43 +1,58 @@
 import { useState } from 'react'
-import { Paper, Title, Stack, Group, Text, ActionIcon, TextInput, Button } from '@mantine/core'
+import { Paper, Title, Stack, Group, Text, ActionIcon, Button, Avatar, Badge } from '@mantine/core'
 import { IconTrash, IconPlus } from '@tabler/icons-react'
+import ProfileSelect from '../common/ProfileSelect'
 
 export default function ProjectMembersList({ members, profiles, onAdd, onRemove }) {
-  const [newMemberId, setNewMemberId] = useState('')
+  const [selectedId, setSelectedId] = useState(null)
 
   const handleAdd = () => {
-    if (newMemberId.trim()) {
-      onAdd(newMemberId.trim())
-      setNewMemberId('')
+    if (selectedId) {
+      onAdd(selectedId)
+      setSelectedId(null)
     }
   }
 
+  const getInitials = (name) => {
+    if (!name) return '?'
+    return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
+  }
+
+  const availableProfiles = profiles.filter(
+    (p) => !members.some((m) => m.profile_id === p.id)
+  )
+
   return (
     <Paper withBorder p="md" radius="md">
-      <Title order={4} mb="sm">
+      <Title order={5} mb="sm">
         Projectgroepleden
       </Title>
 
       {members.length === 0 ? (
-        <Text c="dimmed" size="sm">
-          Geen leden toegevoegd.
+        <Text c="dimmed" size="sm" mb="md">
+          Nog geen leden toegevoegd.
         </Text>
       ) : (
         <Stack gap="xs" mb="md">
           {members.map((member) => {
             const profile = profiles.find((p) => p.id === member.profile_id)
             return (
-              <Group key={member.id} justify="space-between">
-                <div>
-                  <Text size="sm" fw={500}>
-                    {profile?.full_name || 'Onbekend'}
-                  </Text>
-                  {member.role && (
-                    <Text size="xs" c="dimmed">
-                      {member.role}
+              <Group key={member.id} justify="space-between" wrap="nowrap">
+                <Group gap="sm">
+                  <Avatar radius="xl" size="sm" color="brand">
+                    {getInitials(profile?.full_name)}
+                  </Avatar>
+                  <div>
+                    <Text size="sm" fw={500}>
+                      {profile?.full_name || 'Onbekend'}
                     </Text>
-                  )}
-                </div>
+                    {profile?.role && (
+                      <Badge size="xs" variant="light" color="gray">
+                        {profile.role}
+                      </Badge>
+                    )}
+                  </div>
+                </Group>
                 <ActionIcon
                   color="red"
                   variant="subtle"
@@ -52,15 +67,18 @@ export default function ProjectMembersList({ members, profiles, onAdd, onRemove 
         </Stack>
       )}
 
-      <Group>
-        <TextInput
-          placeholder="Profiel ID toevoegen"
-          value={newMemberId}
-          onChange={(e) => setNewMemberId(e.currentTarget.value)}
-          size="xs"
-          style={{ flex: 1 }}
-        />
-        <Button size="xs" leftSection={<IconPlus size={14} />} onClick={handleAdd}>
+      <Group gap="sm">
+        <div style={{ flex: 1 }}>
+          <ProfileSelect
+            profiles={availableProfiles}
+            value={selectedId}
+            onChange={setSelectedId}
+            label={null}
+            placeholder="Collega toevoegen..."
+            size="sm"
+          />
+        </div>
+        <Button size="sm" leftSection={<IconPlus size={14} />} onClick={handleAdd} disabled={!selectedId}>
           Toevoegen
         </Button>
       </Group>

@@ -9,7 +9,30 @@
       "Bash(git init:*)",
       "Bash(git checkout:*)",
       "Bash(git add:*)",
-      "Bash(git commit:*)"
+      "Bash(git commit:*)",
+      "Bash(npx eslint:*)",
+      "Bash(git merge:*)",
+      "Bash(git remote add:*)",
+      "Bash(git push:*)",
+      "Bash(gh pr create:*)",
+      "Bash(npx vitest run)",
+      "Bash(npx vitest --version)",
+      "Bash(npx vitest run:*)",
+      "Bash(test:*)",
+      "Bash(npx vite build:*)",
+      "Bash(git tag:*)",
+      "Bash(git pull:*)",
+      "Bash(echo \"EXIT_CODE=$?\")",
+      "Bash(./node_bin/npx.cmd vite:*)",
+      "Bash(echo \"EXIT=$?\")",
+      "Bash(PATH=\"/c/dev/bnwv_pmw_app/node_bin:$PATH\" node_bin/npx.cmd vite build)",
+      "Bash(./node_bin/node.exe ./node_modules/vite/bin/vite.js build)",
+      "Bash(./node_bin/node.exe -e \"console.log\\(''hello''\\)\")",
+      "Bash(cmd.exe /c \"cd C:\\\\dev\\\\bnwv_pmw_app && node_bin\\\\node.exe node_modules\\\\vite\\\\bin\\\\vite.js build\")",
+      "Bash(cmd.exe /c \"node_bin\\\\node.exe -e console.log\\(''test''\\)\")",
+      "Bash(cmd /c \"node_bin\\\\node.exe -e \"\"console.log\\(''hello''\\)\"\"\")",
+      "Bash(node_bin/node.exe -v)",
+      "Bash(git -c color.ui=never status)"
     ]
   }
 }

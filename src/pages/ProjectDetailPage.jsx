@@ -1,85 +1,207 @@
-import { useState, useEffect } from 'react'
+import { useState, useCallback } from 'react'
 import {
   Title,
   Text,
   Group,
   Button,
-  Select,
   Stack,
   Paper,
   Anchor,
   Loader,
   Center,
+  Grid,
+  Divider,
+  Badge,
 } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
-import { IconEdit, IconExternalLink } from '@tabler/icons-react'
+import { IconEdit, IconExternalLink, IconSparkles } from '@tabler/icons-react'
 import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
+import { useProject } from '../lib/hooks/useProject'
+import { useActivityLog } from '../lib/hooks/useActivityLog'
 import { formatDate } from '../lib/utils/dateUtils'
-import { getStatusColor } from '../lib/utils/projectUtils'
-import QualityChecklist from '../components/projects/QualityChecklist'
+import { getPhaseLabel, getPhaseColor, getNextPhase, PHASES } from '../lib/utils/phaseConfig'
+import PhaseTimeline from '../components/projects/PhaseTimeline'
+import PhaseWorkspace from '../components/projects/PhaseWorkspace'
+import PhaseGate from '../components/projects/PhaseGate'
 import ProjectMembersList from '../components/projects/ProjectMembersList'
-
-const STATUS_OPTIONS = [
-  'Niet gestart',
-  'In opstart',
-  'In uitvoering',
-  'In afronding',
-  'Afgerond',
-  'Gearchiveerd',
-]
+import SuccessIndicators from '../components/projects/SuccessIndicators'
+import ActivityFeed from '../components/projects/ActivityFeed'
 
 export default function ProjectDetailPage() {
   const { id } = useParams()
   const navigate = useNavigate()
-  const [project, setProject] = useState(null)
-  const [qualityCheck, setQualityCheck] = useState(null)
-  const [members, setMembers] = useState([])
-  const [profiles, setProfiles] = useState([])
-  const [loading, setLoading] = useState(true)
+  const {
+    project, setProject,
+    phases, setPhases,
+    members, setMembers,
+    profiles,
+    deliverables, setDeliverables,
+    tasks, setTasks,
+    comments, setComments,
+    indicators, setIndicators,
+    activity, setActivity,
+    loading,
+    refetch,
+  } = useProject(id)
+  const { log } = useActivityLog(id)
 
-  useEffect(() => {
-    const fetch = async () => {
-      const [projectRes, qcRes, membersRes, profilesRes] = await Promise.all([
-        supabase.from('projects').select('*').eq('id', id).single(),
-        supabase.from('quality_checks').select('*').eq('project_id', id).single(),
-        supabase.from('project_members').select('*').eq('project_id', id),
-        supabase.from('profiles').select('*'),
-      ])
+  const [selectedPhase, setSelectedPhase] = useState(null)
 
-      setProject(projectRes.data)
-      setQualityCheck(qcRes.data)
-      setMembers(membersRes.data || [])
-      setProfiles(profilesRes.data || [])
-      setLoading(false)
-    }
-    fetch()
-  }, [id])
+  const activePhase = selectedPhase || project?.current_phase || 'initiatief'
 
-  const handleStatusChange = async (status) => {
-    const { error } = await supabase
-      .from('projects')
-      .update({ status, updated_at: new Date().toISOString() })
-      .eq('id', id)
+  // ---- Deliverables ----
+  const handleAddDeliverable = async (payload) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    const { data, error } = await supabase
+      .from('project_deliverables')
+      .insert({ ...payload, project_id: id, created_by: user?.id })
+      .select()
+      .single()
 
     if (error) {
-      notifications.show({ title: 'Fout', message: 'Status wijzigen mislukt.', color: 'red' })
+      notifications.show({ title: 'Fout', message: 'Document toevoegen mislukt.', color: 'red' })
     } else {
-      setProject((prev) => ({ ...prev, status }))
-      notifications.show({ title: 'Opgeslagen', message: 'Status bijgewerkt.', color: 'green' })
+      setDeliverables((prev) => [data, ...prev])
+      await log('deliverable_created', 'deliverable', data.id, { title: data.title })
+      notifications.show({ title: 'Toegevoegd', message: 'Document aangemaakt.', color: 'green' })
     }
   }
 
-  const handleQualityUpdate = async (updated) => {
-    const { error } = await supabase.from('quality_checks').update(updated).eq('id', updated.id)
+  const handleUpdateDeliverable = async (item) => {
+    const { error } = await supabase
+      .from('project_deliverables')
+      .update({
+        title: item.title,
+        type: item.type,
+        status: item.status,
+        sharepoint_url: item.sharepoint_url,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', item.id)
 
     if (error) {
       notifications.show({ title: 'Fout', message: 'Opslaan mislukt.', color: 'red' })
     } else {
-      setQualityCheck(updated)
+      setDeliverables((prev) => prev.map((d) => (d.id === item.id ? item : d)))
+      await log('deliverable_updated', 'deliverable', item.id, { title: item.title })
     }
   }
 
+  const handleDeleteDeliverable = async (deliverableId) => {
+    const { error } = await supabase.from('project_deliverables').delete().eq('id', deliverableId)
+    if (!error) {
+      setDeliverables((prev) => prev.filter((d) => d.id !== deliverableId))
+    }
+  }
+
+  // ---- Tasks ----
+  const handleAddTask = async (payload) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    const { data, error } = await supabase
+      .from('project_tasks')
+      .insert({ ...payload, project_id: id, created_by: user?.id })
+      .select()
+      .single()
+
+    if (error) {
+      notifications.show({ title: 'Fout', message: 'Taak toevoegen mislukt.', color: 'red' })
+    } else {
+      setTasks((prev) => [...prev, data])
+      await log('task_created', 'task', data.id, { title: data.title })
+      notifications.show({ title: 'Toegevoegd', message: 'Taak aangemaakt.', color: 'green' })
+    }
+  }
+
+  const handleUpdateTask = async (item) => {
+    const wasCompleted = item.status === 'afgerond'
+    const { error } = await supabase
+      .from('project_tasks')
+      .update({
+        title: item.title,
+        description: item.description,
+        assigned_to: item.assigned_to,
+        due_date: item.due_date,
+        status: item.status,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', item.id)
+
+    if (!error) {
+      setTasks((prev) => prev.map((t) => (t.id === item.id ? item : t)))
+      if (wasCompleted) {
+        await log('task_completed', 'task', item.id, { title: item.title })
+      }
+    }
+  }
+
+  const handleDeleteTask = async (taskId) => {
+    const { error } = await supabase.from('project_tasks').delete().eq('id', taskId)
+    if (!error) {
+      setTasks((prev) => prev.filter((t) => t.id !== taskId))
+    }
+  }
+
+  // ---- Comments ----
+  const handleAddComment = async (payload) => {
+    const { data: { user } } = await supabase.auth.getUser()
+    const { data, error } = await supabase
+      .from('project_comments')
+      .insert({ ...payload, project_id: id, author_id: user?.id })
+      .select()
+      .single()
+
+    if (error) {
+      notifications.show({ title: 'Fout', message: 'Opmerking plaatsen mislukt.', color: 'red' })
+    } else {
+      setComments((prev) => [data, ...prev])
+      await log('comment_added', 'comment', data.id)
+    }
+  }
+
+  // ---- Indicators ----
+  const handleAddIndicator = async (payload) => {
+    const { data, error } = await supabase
+      .from('success_indicators')
+      .insert({ ...payload, project_id: id })
+      .select()
+      .single()
+
+    if (error) {
+      notifications.show({ title: 'Fout', message: 'Criterium toevoegen mislukt.', color: 'red' })
+    } else {
+      setIndicators((prev) => [...prev, data])
+    }
+  }
+
+  const handleUpdateIndicator = async (item) => {
+    const { error } = await supabase
+      .from('success_indicators')
+      .update({
+        title: item.title,
+        description: item.description,
+        target_value: item.target_value,
+        measurement_method: item.measurement_method,
+        current_value: item.current_value,
+        status: item.status,
+        updated_at: new Date().toISOString(),
+      })
+      .eq('id', item.id)
+
+    if (!error) {
+      setIndicators((prev) => prev.map((i) => (i.id === item.id ? item : i)))
+      await log('indicator_updated', 'indicator', item.id, { title: item.title })
+    }
+  }
+
+  const handleDeleteIndicator = async (indicatorId) => {
+    const { error } = await supabase.from('success_indicators').delete().eq('id', indicatorId)
+    if (!error) {
+      setIndicators((prev) => prev.filter((i) => i.id !== indicatorId))
+    }
+  }
+
+  // ---- Members ----
   const handleAddMember = async (profileId) => {
     const { data, error } = await supabase
       .from('project_members')
@@ -91,17 +213,84 @@ export default function ProjectDetailPage() {
       notifications.show({ title: 'Fout', message: 'Lid toevoegen mislukt.', color: 'red' })
     } else {
       setMembers((prev) => [...prev, data])
+      const profile = profiles.find((p) => p.id === profileId)
+      await log('member_added', 'member', data.id, { name: profile?.full_name })
     }
   }
 
   const handleRemoveMember = async (memberId) => {
     const { error } = await supabase.from('project_members').delete().eq('id', memberId)
-
-    if (error) {
-      notifications.show({ title: 'Fout', message: 'Lid verwijderen mislukt.', color: 'red' })
-    } else {
+    if (!error) {
       setMembers((prev) => prev.filter((m) => m.id !== memberId))
+      await log('member_removed', 'member', memberId)
     }
+  }
+
+  // ---- Phase Gate ----
+  const handlePhaseApprove = async (phaseKey, notes) => {
+    const phaseRecord = phases.find((p) => p.phase === phaseKey)
+    if (!phaseRecord) return
+
+    const { data: { user } } = await supabase.auth.getUser()
+    const now = new Date().toISOString()
+
+    const { error: gateError } = await supabase
+      .from('project_phases')
+      .update({
+        gate_approved: true,
+        gate_approved_by: user?.id,
+        gate_approved_at: now,
+        gate_notes: notes || null,
+        completed_at: now,
+      })
+      .eq('id', phaseRecord.id)
+
+    if (gateError) {
+      notifications.show({ title: 'Fout', message: 'Fase afsluiten mislukt.', color: 'red' })
+      return
+    }
+
+    const nextPhaseKey = getNextPhase(phaseKey)
+
+    if (nextPhaseKey) {
+      const nextPhaseRecord = phases.find((p) => p.phase === nextPhaseKey)
+      if (nextPhaseRecord) {
+        await supabase
+          .from('project_phases')
+          .update({ started_at: now })
+          .eq('id', nextPhaseRecord.id)
+      }
+
+      await supabase
+        .from('projects')
+        .update({ current_phase: nextPhaseKey, updated_at: now })
+        .eq('id', id)
+
+      setProject((prev) => ({ ...prev, current_phase: nextPhaseKey }))
+      setSelectedPhase(nextPhaseKey)
+    } else {
+      await supabase
+        .from('projects')
+        .update({ current_phase: 'afgerond', status: 'Afgerond', updated_at: now })
+        .eq('id', id)
+
+      setProject((prev) => ({ ...prev, current_phase: 'afgerond', status: 'Afgerond' }))
+    }
+
+    await log('phase_advanced', 'phase', phaseRecord.id, {
+      from: phaseKey,
+      to: nextPhaseKey || 'afgerond',
+    })
+
+    notifications.show({
+      title: 'Fase afgerond',
+      message: nextPhaseKey
+        ? `Doorgeschoven naar ${getPhaseLabel(nextPhaseKey)}.`
+        : 'Project afgerond!',
+      color: 'green',
+    })
+
+    refetch()
   }
 
   if (loading) {
@@ -120,34 +309,39 @@ export default function ProjectDetailPage() {
     )
   }
 
+  const currentPhaseRecord = phases.find((p) => p.phase === activePhase)
+
   return (
     <Stack gap="lg">
-      <Group justify="space-between">
+      {/* Header */}
+      <Group justify="space-between" align="flex-start">
         <div>
-          <Title order={2}>{project.name}</Title>
-          <Group gap="xs" mt="xs">
+          <Group gap="sm" mb={4}>
+            <Title order={2}>{project.name}</Title>
+            <Badge color={getPhaseColor(project.current_phase)} variant="light" size="lg">
+              {project.current_phase === 'afgerond' ? 'Afgerond' : getPhaseLabel(project.current_phase)}
+            </Badge>
+          </Group>
+          <Group gap="md">
             {project.start_date && (
-              <Text size="sm" c="dimmed">
-                Start: {formatDate(project.start_date)}
-              </Text>
+              <Text size="sm" c="dimmed">Start: {formatDate(project.start_date)}</Text>
             )}
             {project.end_date && (
-              <Text size="sm" c="dimmed">
-                Eind: {formatDate(project.end_date)}
-              </Text>
+              <Text size="sm" c="dimmed">Eind: {formatDate(project.end_date)}</Text>
             )}
           </Group>
         </div>
         <Group>
-          <Select
-            data={STATUS_OPTIONS}
-            value={project.status}
-            onChange={handleStatusChange}
-            w={180}
-            styles={{
-              input: { color: `var(--mantine-color-${getStatusColor(project.status)}-6)` },
-            }}
-          />
+          {project.current_phase !== 'afgerond' && (
+            <Button
+              variant="light"
+              color="violet"
+              leftSection={<IconSparkles size={16} />}
+              onClick={() => navigate(`/projects/${id}/ai`)}
+            >
+              AI Assistent
+            </Button>
+          )}
           <Button
             variant="light"
             leftSection={<IconEdit size={16} />}
@@ -160,55 +354,93 @@ export default function ProjectDetailPage() {
 
       {project.description && (
         <Paper withBorder p="md" radius="md">
-          <Title order={4} mb="xs">
-            Omschrijving
-          </Title>
           <Text size="sm">{project.description}</Text>
         </Paper>
       )}
 
+      {/* SharePoint Links */}
       {(project.sharepoint_project_url || project.sharepoint_actions_url) && (
+        <Group gap="md">
+          {project.sharepoint_project_url && (
+            <Anchor href={project.sharepoint_project_url} target="_blank" size="sm">
+              <Group gap={4}><IconExternalLink size={14} />Projectmap</Group>
+            </Anchor>
+          )}
+          {project.sharepoint_actions_url && (
+            <Anchor href={project.sharepoint_actions_url} target="_blank" size="sm">
+              <Group gap={4}><IconExternalLink size={14} />Actielijst</Group>
+            </Anchor>
+          )}
+        </Group>
+      )}
+
+      {/* Phase Timeline */}
+      {project.current_phase !== 'afgerond' && (
         <Paper withBorder p="md" radius="md">
-          <Title order={4} mb="xs">
-            SharePoint links
-          </Title>
-          <Stack gap="xs">
-            {project.sharepoint_project_url && (
-              <Anchor
-                href={project.sharepoint_project_url}
-                target="_blank"
-                size="sm"
-              >
-                <Group gap={4}>
-                  <IconExternalLink size={14} />
-                  Projectmap openen
-                </Group>
-              </Anchor>
-            )}
-            {project.sharepoint_actions_url && (
-              <Anchor
-                href={project.sharepoint_actions_url}
-                target="_blank"
-                size="sm"
-              >
-                <Group gap={4}>
-                  <IconExternalLink size={14} />
-                  Actielijst openen
-                </Group>
-              </Anchor>
-            )}
-          </Stack>
+          <PhaseTimeline
+            currentPhase={project.current_phase}
+            phases={phases}
+            selectedPhase={activePhase}
+            onSelectPhase={setSelectedPhase}
+          />
         </Paper>
       )}
 
-      <QualityChecklist qualityCheck={qualityCheck} onUpdate={handleQualityUpdate} />
+      {/* Main content */}
+      <Grid gutter="lg">
+        <Grid.Col span={{ base: 12, lg: 8 }}>
+          <Stack gap="lg">
+            {/* Phase Workspace */}
+            {project.current_phase !== 'afgerond' && (
+              <PhaseWorkspace
+                phase={activePhase}
+                project={project}
+                deliverables={deliverables}
+                tasks={tasks}
+                comments={comments}
+                profiles={profiles}
+                onAddDeliverable={handleAddDeliverable}
+                onUpdateDeliverable={handleUpdateDeliverable}
+                onDeleteDeliverable={handleDeleteDeliverable}
+                onAddTask={handleAddTask}
+                onUpdateTask={handleUpdateTask}
+                onDeleteTask={handleDeleteTask}
+                onAddComment={handleAddComment}
+              />
+            )}
 
-      <ProjectMembersList
-        members={members}
-        profiles={profiles}
-        onAdd={handleAddMember}
-        onRemove={handleRemoveMember}
-      />
+            {/* Phase Gate */}
+            {activePhase === project.current_phase && project.current_phase !== 'afgerond' && (
+              <PhaseGate
+                phase={activePhase}
+                phaseRecord={currentPhaseRecord}
+                deliverables={deliverables}
+                onApprove={handlePhaseApprove}
+              />
+            )}
+          </Stack>
+        </Grid.Col>
+
+        <Grid.Col span={{ base: 12, lg: 4 }}>
+          <Stack gap="lg">
+            <SuccessIndicators
+              indicators={indicators}
+              onAdd={handleAddIndicator}
+              onUpdate={handleUpdateIndicator}
+              onDelete={handleDeleteIndicator}
+            />
+
+            <ProjectMembersList
+              members={members}
+              profiles={profiles}
+              onAdd={handleAddMember}
+              onRemove={handleRemoveMember}
+            />
+
+            <ActivityFeed activity={activity} profiles={profiles} />
+          </Stack>
+        </Grid.Col>
+      </Grid>
     </Stack>
   )
 }
