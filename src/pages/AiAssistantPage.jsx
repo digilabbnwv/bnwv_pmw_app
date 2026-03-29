@@ -28,6 +28,7 @@ import { useParams, useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
 import { useAi } from '../lib/hooks/useAi'
 import StartnotitieWizard from '../components/ai/StartnotitieWizard'
+import MarkdownContent from '../components/common/MarkdownContent'
 
 function AiChat({ project, sessionType, placeholder }) {
   const { messages, loading, error, sendMessage } = useAi(project.id, sessionType)
@@ -80,7 +81,11 @@ function AiChat({ project, sessionType, placeholder }) {
                 bg={msg.role === 'user' ? 'brand.0' : 'gray.0'}
                 withBorder={msg.role === 'assistant'}
               >
-                <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</Text>
+                {msg.role === 'assistant' ? (
+                  <MarkdownContent content={msg.content} />
+                ) : (
+                  <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>{msg.content}</Text>
+                )}
               </Paper>
             </Group>
           ))}

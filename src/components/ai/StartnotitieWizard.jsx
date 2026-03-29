@@ -18,6 +18,7 @@ import { notifications } from '@mantine/notifications'
 import { IconSparkles, IconCheck, IconCopy, IconArrowRight, IconArrowLeft } from '@tabler/icons-react'
 import { useAi } from '../../lib/hooks/useAi'
 import { supabase } from '../../lib/supabaseClient'
+import MarkdownContent from '../common/MarkdownContent'
 
 const STEPS = [
   {
@@ -185,7 +186,7 @@ Maak het professioneel, helder en compleet. Neem de input van de gebruiker als b
         </Group>
 
         <Paper p="lg" radius="md" withBorder>
-          <Text style={{ whiteSpace: 'pre-wrap' }}>{generatedDoc}</Text>
+          <MarkdownContent content={generatedDoc} />
         </Paper>
 
         <Group justify="flex-end">
@@ -282,12 +283,22 @@ Maak het professioneel, helder en compleet. Neem de input van de gebruiker als b
       )}
 
       {aiResponse && (
-        <Paper p="md" radius="md" withBorder bg="violet.0" style={{ borderColor: 'var(--mantine-color-violet-3)' }}>
-          <Group gap="sm" mb="sm">
-            <IconSparkles size={16} color="var(--mantine-color-violet-6)" />
-            <Text fw={600} size="sm" c="violet">AI Feedback</Text>
+        <Paper
+          p="md"
+          radius="md"
+          withBorder
+          style={{
+            borderColor: 'var(--mantine-color-violet-4)',
+            background: 'var(--mantine-color-violet-light)',
+          }}
+        >
+          <Group gap="xs" mb="sm">
+            <IconSparkles size={18} color="var(--mantine-color-violet-6)" />
+            <Text fw={700} size="sm" c="violet.7">
+              AI Feedback
+            </Text>
           </Group>
-          <Text size="sm" style={{ whiteSpace: 'pre-wrap' }}>{aiResponse}</Text>
+          <MarkdownContent content={aiResponse} />
         </Paper>
       )}
     </Stack>
