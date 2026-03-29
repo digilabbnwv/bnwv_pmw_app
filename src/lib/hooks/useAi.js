@@ -17,40 +17,24 @@ export function useAi(projectId, sessionType) {
       setMessages(updatedMessages)
 
       try {
-        const { data: { session } } = await supabase.auth.getSession()
-        if (!session?.access_token) {
-          throw new Error('Niet ingelogd')
+        console.log('[useAi] Calling ai-generate via supabase.functions.invoke')
+
+        const { data, error: fnError } = await supabase.functions.invoke('ai-generate', {
+          body: {
+            session_type: sessionType,
+            messages: updatedMessages,
+            context,
+            project_id: projectId,
+          },
+        })
+
+        if (fnError) {
+          console.error('[useAi] Function error:', fnError)
+          throw new Error(fnError.message || 'AI service niet beschikbaar')
         }
 
-        const functionUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-generate`
-        console.log('[useAi] Calling edge function:', functionUrl)
+        console.log('[useAi] Response:', data)
 
-        const response = await fetch(
-          functionUrl,
-          {
-            method: 'POST',
-            headers: {
-              'Content-Type': 'application/json',
-              Authorization: `Bearer ${session.access_token}`,
-            },
-            body: JSON.stringify({
-              session_type: sessionType,
-              messages: updatedMessages,
-              context,
-              project_id: projectId,
-            }),
-          }
-        )
-
-        console.log('[useAi] Response status:', response.status)
-
-        if (!response.ok) {
-          const errData = await response.json().catch(() => ({}))
-          console.error('[useAi] Error response:', errData)
-          throw new Error(errData.error || `AI service niet beschikbaar (status ${response.status})`)
-        }
-
-        const data = await response.json()
         const assistantMessage = { role: 'assistant', content: data.message }
         const allMessages = [...updatedMessages, assistantMessage]
         setMessages(allMessages)
