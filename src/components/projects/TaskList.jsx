@@ -164,14 +164,14 @@ export default function TaskList({ tasks, phase, profiles, onAdd, onUpdate, onDe
             placeholder="Wat moet er gebeuren?"
             required
             value={form.title}
-            onChange={(e) => setForm((prev) => ({ ...prev, title: e.currentTarget.value }))}
+            onChange={(e) => setForm((prev) => ({ ...prev, title: e?.currentTarget?.value ?? '' }))}
           />
           <Textarea
             label="Omschrijving (optioneel)"
             placeholder="Meer details..."
             rows={2}
             value={form.description}
-            onChange={(e) => setForm((prev) => ({ ...prev, description: e.currentTarget.value }))}
+            onChange={(e) => setForm((prev) => ({ ...prev, description: e?.currentTarget?.value ?? '' }))}
           />
           <Select
             label="Toegewezen aan"

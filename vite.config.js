@@ -5,4 +5,7 @@ import react from '@vitejs/plugin-react'
 export default defineConfig({
   plugins: [react()],
   base: '/bnwv_pmw_app/',
+  build: {
+    sourcemap: false,
+  },
 })

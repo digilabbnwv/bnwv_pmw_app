@@ -75,7 +75,7 @@ export default function PhaseGate({ phase, phaseRecord, deliverables, onApprove 
         label="Opmerkingen bij afsluiting (optioneel)"
         placeholder="Eventuele opmerkingen of leerpunten..."
         value={notes}
-        onChange={(e) => setNotes(e.currentTarget.value)}
+        onChange={(e) => setNotes(e?.currentTarget?.value ?? '')}
         mb="md"
         rows={2}
       />
