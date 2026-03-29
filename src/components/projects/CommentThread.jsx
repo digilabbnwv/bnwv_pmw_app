@@ -63,7 +63,7 @@ export default function CommentThread({ comments, phase, profiles, onAdd }) {
         <Textarea
           placeholder="Schrijf een opmerking... (Ctrl+Enter om te versturen)"
           value={content}
-          onChange={(e) => setContent(e.currentTarget.value)}
+          onChange={(e) => setContent(e?.currentTarget?.value ?? '')}
           onKeyDown={handleKeyDown}
           rows={2}
           mb="xs"

@@ -60,7 +60,7 @@ export default function AllProjectsPage() {
           placeholder="Zoeken op naam..."
           leftSection={<IconSearch size={16} />}
           value={search}
-          onChange={(e) => setSearch(e.currentTarget.value)}
+          onChange={(e) => setSearch(e?.currentTarget?.value ?? '')}
           style={{ flex: 1 }}
         />
         <Select

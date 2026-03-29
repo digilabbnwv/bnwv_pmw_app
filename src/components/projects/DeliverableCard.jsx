@@ -130,7 +130,7 @@ export default function DeliverableCard({ deliverables, phase, onAdd, onUpdate, 
             placeholder="Titel van het document"
             required
             value={form.title}
-            onChange={(e) => setForm((prev) => ({ ...prev, title: e.currentTarget.value }))}
+            onChange={(e) => setForm((prev) => ({ ...prev, title: e?.currentTarget?.value ?? '' }))}
           />
           <Select
             label="Type"
@@ -152,7 +152,7 @@ export default function DeliverableCard({ deliverables, phase, onAdd, onUpdate, 
             label="SharePoint URL (optioneel)"
             placeholder="https://..."
             value={form.sharepoint_url}
-            onChange={(e) => setForm((prev) => ({ ...prev, sharepoint_url: e.currentTarget.value }))}
+            onChange={(e) => setForm((prev) => ({ ...prev, sharepoint_url: e?.currentTarget?.value ?? '' }))}
           />
           <Group justify="flex-end">
             <Button variant="default" onClick={close}>Annuleren</Button>
