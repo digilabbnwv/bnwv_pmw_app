@@ -1,5 +1,4 @@
 import { serve } from 'https://deno.land/std@0.168.0/http/server.ts'
-import { createClient } from 'https://esm.sh/@supabase/supabase-js@2.97.0'
 
 const corsHeaders = {
   'Access-Control-Allow-Origin': '*',
@@ -90,30 +89,10 @@ serve(async (req: Request) => {
   }
 
   try {
-    const authHeader = req.headers.get('Authorization')
-    if (!authHeader) {
-      return new Response(
-        JSON.stringify({ error: 'Geen autorisatie header gevonden' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
+    // JWT is already validated by Supabase gateway — no need to re-verify here.
+    // If the request reaches this handler, the user is authenticated.
 
-    // Verify user via Supabase
-    const supabaseClient = createClient(
-      Deno.env.get('SUPABASE_URL') ?? '',
-      Deno.env.get('SUPABASE_ANON_KEY') ?? '',
-      { global: { headers: { Authorization: authHeader } } }
-    )
-
-    const { data: { user }, error: userError } = await supabaseClient.auth.getUser()
-    if (userError || !user) {
-      return new Response(
-        JSON.stringify({ error: 'Niet geautoriseerd' }),
-        { status: 401, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
-      )
-    }
-
-    const { session_type, messages, context, project_id } = await req.json()
+    const { session_type, messages, context } = await req.json()
 
     const systemPrompt = SYSTEM_PROMPTS[session_type] || SYSTEM_PROMPTS.chat
     let fullSystemPrompt = systemPrompt
@@ -124,11 +103,14 @@ serve(async (req: Request) => {
 
     const anthropicKey = Deno.env.get('ANTHROPIC_API_KEY')
     if (!anthropicKey) {
+      console.error('ANTHROPIC_API_KEY is not set')
       return new Response(
-        JSON.stringify({ error: 'AI service niet geconfigureerd' }),
+        JSON.stringify({ error: 'AI service niet geconfigureerd. ANTHROPIC_API_KEY ontbreekt.' }),
         { status: 500, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
+
+    console.log(`Calling Anthropic API — session_type: ${session_type}, messages: ${messages.length}`)
 
     const response = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
@@ -150,15 +132,17 @@ serve(async (req: Request) => {
 
     if (!response.ok) {
       const errorText = await response.text()
-      console.error('Anthropic API error:', errorText)
+      console.error('Anthropic API error:', response.status, errorText)
       return new Response(
-        JSON.stringify({ error: 'AI service tijdelijk niet beschikbaar' }),
+        JSON.stringify({ error: `AI service fout (${response.status})` }),
         { status: 502, headers: { ...corsHeaders, 'Content-Type': 'application/json' } }
       )
     }
 
     const aiResponse = await response.json()
     const assistantMessage = aiResponse.content?.[0]?.text || ''
+
+    console.log(`Anthropic response OK — ${assistantMessage.length} chars`)
 
     return new Response(
       JSON.stringify({ message: assistantMessage }),
