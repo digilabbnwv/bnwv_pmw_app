@@ -224,7 +224,7 @@ Maak het professioneel, helder en compleet. Neem de input van de gebruiker als b
             placeholder={currentStep.placeholder}
             value={answers[currentStep.key]}
             onChange={(e) =>
-              setAnswers((prev) => ({ ...prev, [currentStep.key]: e?.currentTarget?.value ?? '' }))
+              { const v = e.currentTarget.value; setAnswers((prev) => ({ ...prev, [currentStep.key]: v })); }
             }
             rows={5}
             autosize

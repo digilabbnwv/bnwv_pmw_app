@@ -151,7 +151,7 @@ export default function ProjectFormPage() {
               placeholder="Naam van het project"
               required
               value={form.name}
-              onChange={(e) => setForm((prev) => ({ ...prev, name: e?.currentTarget?.value ?? '' }))}
+              onChange={(e) => { const v = e.currentTarget.value; setForm((prev) => ({ ...prev, name: v })); }}
             />
 
             <Textarea
@@ -160,7 +160,7 @@ export default function ProjectFormPage() {
               rows={3}
               value={form.description}
               onChange={(e) =>
-                setForm((prev) => ({ ...prev, description: e?.currentTarget?.value ?? '' }))
+                { const v = e.currentTarget.value; setForm((prev) => ({ ...prev, description: v })); }
               }
             />
 
@@ -186,7 +186,7 @@ export default function ProjectFormPage() {
               placeholder="https://..."
               value={form.sharepoint_project_url}
               onChange={(e) =>
-                setForm((prev) => ({ ...prev, sharepoint_project_url: e?.currentTarget?.value ?? '' }))
+                { const v = e.currentTarget.value; setForm((prev) => ({ ...prev, sharepoint_project_url: v })); }
               }
             />
 
@@ -195,7 +195,7 @@ export default function ProjectFormPage() {
               placeholder="https://..."
               value={form.sharepoint_actions_url}
               onChange={(e) =>
-                setForm((prev) => ({ ...prev, sharepoint_actions_url: e?.currentTarget?.value ?? '' }))
+                { const v = e.currentTarget.value; setForm((prev) => ({ ...prev, sharepoint_actions_url: v })); }
               }
             />
 

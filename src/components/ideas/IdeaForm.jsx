@@ -53,14 +53,14 @@ export default function IdeaForm({ opened, onClose, onSubmit, editItem, profiles
           placeholder="Kort en krachtig"
           required
           value={form.title}
-          onChange={(e) => setForm((prev) => ({ ...prev, title: e?.currentTarget?.value ?? '' }))}
+          onChange={(e) => { const v = e.currentTarget.value; setForm((prev) => ({ ...prev, title: v })); }}
         />
         <Textarea
           label="Omschrijving"
           placeholder="Beschrijf het idee..."
           rows={3}
           value={form.description}
-          onChange={(e) => setForm((prev) => ({ ...prev, description: e?.currentTarget?.value ?? '' }))}
+          onChange={(e) => { const v = e.currentTarget.value; setForm((prev) => ({ ...prev, description: v })); }}
         />
         <Select
           label="Categorie"

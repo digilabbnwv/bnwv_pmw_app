@@ -114,14 +114,14 @@ export default function LoginPage() {
                 placeholder="je@email.nl"
                 required
                 value={email}
-                onChange={(e) => setEmail(e?.currentTarget?.value ?? '')}
+                onChange={(e) => setEmail(e.currentTarget.value)}
               />
               <PasswordInput
                 label="Wachtwoord"
                 placeholder="Je wachtwoord"
                 required
                 value={password}
-                onChange={(e) => setPassword(e?.currentTarget?.value ?? '')}
+                onChange={(e) => setPassword(e.currentTarget.value)}
               />
               <Button type="submit" fullWidth loading={loading}>
                 Inloggen

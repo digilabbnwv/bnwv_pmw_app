@@ -153,32 +153,32 @@ export default function SuccessIndicators({ indicators, onAdd, onUpdate, onDelet
             placeholder="Bijv. Klanttevredenheid, Bereik doelgroep"
             required
             value={form.title}
-            onChange={(e) => setForm((prev) => ({ ...prev, title: e?.currentTarget?.value ?? '' }))}
+            onChange={(e) => { const v = e.currentTarget.value; setForm((prev) => ({ ...prev, title: v })); }}
           />
           <Textarea
             label="Omschrijving"
             placeholder="Wat wil je precies meten?"
             rows={2}
             value={form.description}
-            onChange={(e) => setForm((prev) => ({ ...prev, description: e?.currentTarget?.value ?? '' }))}
+            onChange={(e) => { const v = e.currentTarget.value; setForm((prev) => ({ ...prev, description: v })); }}
           />
           <TextInput
             label="Doelwaarde"
             placeholder="Bijv. Minimaal 80% tevredenheid"
             value={form.target_value}
-            onChange={(e) => setForm((prev) => ({ ...prev, target_value: e?.currentTarget?.value ?? '' }))}
+            onChange={(e) => { const v = e.currentTarget.value; setForm((prev) => ({ ...prev, target_value: v })); }}
           />
           <TextInput
             label="Meetmethode"
             placeholder="Hoe ga je dit meten?"
             value={form.measurement_method}
-            onChange={(e) => setForm((prev) => ({ ...prev, measurement_method: e?.currentTarget?.value ?? '' }))}
+            onChange={(e) => { const v = e.currentTarget.value; setForm((prev) => ({ ...prev, measurement_method: v })); }}
           />
           <TextInput
             label="Huidige waarde"
             placeholder="Vul in na meting"
             value={form.current_value}
-            onChange={(e) => setForm((prev) => ({ ...prev, current_value: e?.currentTarget?.value ?? '' }))}
+            onChange={(e) => { const v = e.currentTarget.value; setForm((prev) => ({ ...prev, current_value: v })); }}
           />
           <Select
             label="Status"

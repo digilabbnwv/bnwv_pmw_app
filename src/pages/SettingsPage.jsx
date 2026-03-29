@@ -98,7 +98,7 @@ export default function SettingsPage() {
               label="Volledige naam"
               placeholder="Je naam"
               value={fullName}
-              onChange={(e) => setFullName(e?.currentTarget?.value ?? '')}
+              onChange={(e) => setFullName(e.currentTarget.value)}
             />
             <Button onClick={handleSave} loading={saving}>
               Opslaan
