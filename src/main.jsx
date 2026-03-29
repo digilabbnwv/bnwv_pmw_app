@@ -23,6 +23,28 @@ const theme = createTheme({
       '#331405',
     ],
   },
+  defaultRadius: 'md',
+  fontFamily: '-apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif',
+  headings: {
+    fontWeight: '700',
+  },
+  components: {
+    Paper: {
+      defaultProps: {
+        shadow: 'xs',
+      },
+    },
+    Button: {
+      defaultProps: {
+        radius: 'md',
+      },
+    },
+    ActionIcon: {
+      defaultProps: {
+        radius: 'md',
+      },
+    },
+  },
 })
 
 createRoot(document.getElementById('root')).render(

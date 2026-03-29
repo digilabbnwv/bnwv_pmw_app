@@ -12,23 +12,20 @@ import {
 import { IconPlus, IconSearch } from '@tabler/icons-react'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../lib/supabaseClient'
+import { PHASES } from '../lib/utils/phaseConfig'
 import ProjectCard from '../components/projects/ProjectCard'
 
-const STATUS_OPTIONS = [
-  { value: '', label: 'Alle statussen' },
-  { value: 'Niet gestart', label: 'Niet gestart' },
-  { value: 'In opstart', label: 'In opstart' },
-  { value: 'In uitvoering', label: 'In uitvoering' },
-  { value: 'In afronding', label: 'In afronding' },
-  { value: 'Afgerond', label: 'Afgerond' },
-  { value: 'Gearchiveerd', label: 'Gearchiveerd' },
+const PHASE_OPTIONS = [
+  { value: '', label: 'Alle fases' },
+  ...PHASES.map((p) => ({ value: p.key, label: p.label })),
+  { value: 'afgerond', label: 'Afgerond' },
 ]
 
 export default function AllProjectsPage() {
   const [projects, setProjects] = useState([])
   const [loading, setLoading] = useState(true)
   const [search, setSearch] = useState('')
-  const [statusFilter, setStatusFilter] = useState('')
+  const [phaseFilter, setPhaseFilter] = useState('')
   const navigate = useNavigate()
 
   useEffect(() => {
@@ -42,8 +39,8 @@ export default function AllProjectsPage() {
 
   const filtered = projects.filter((p) => {
     const matchesSearch = p.name.toLowerCase().includes(search.toLowerCase())
-    const matchesStatus = !statusFilter || p.status === statusFilter
-    return matchesSearch && matchesStatus
+    const matchesPhase = !phaseFilter || (p.current_phase || 'initiatief') === phaseFilter
+    return matchesSearch && matchesPhase
   })
 
   return (
@@ -67,10 +64,10 @@ export default function AllProjectsPage() {
           style={{ flex: 1 }}
         />
         <Select
-          placeholder="Filter op status"
-          data={STATUS_OPTIONS}
-          value={statusFilter}
-          onChange={(val) => setStatusFilter(val || '')}
+          placeholder="Filter op fase"
+          data={PHASE_OPTIONS}
+          value={phaseFilter}
+          onChange={(val) => setPhaseFilter(val || '')}
           clearable
           w={200}
         />
@@ -78,9 +75,9 @@ export default function AllProjectsPage() {
 
       {loading ? (
         <Stack gap="sm">
-          <Skeleton height={80} radius="md" />
-          <Skeleton height={80} radius="md" />
-          <Skeleton height={80} radius="md" />
+          <Skeleton height={90} radius="md" />
+          <Skeleton height={90} radius="md" />
+          <Skeleton height={90} radius="md" />
         </Stack>
       ) : filtered.length === 0 ? (
         <Text c="dimmed" ta="center" mt="xl">
