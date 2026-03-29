@@ -22,8 +22,11 @@ export function useAi(projectId, sessionType) {
           throw new Error('Niet ingelogd')
         }
 
+        const functionUrl = `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-generate`
+        console.log('[useAi] Calling edge function:', functionUrl)
+
         const response = await fetch(
-          `${import.meta.env.VITE_SUPABASE_URL}/functions/v1/ai-generate`,
+          functionUrl,
           {
             method: 'POST',
             headers: {
@@ -39,9 +42,12 @@ export function useAi(projectId, sessionType) {
           }
         )
 
+        console.log('[useAi] Response status:', response.status)
+
         if (!response.ok) {
           const errData = await response.json().catch(() => ({}))
-          throw new Error(errData.error || 'AI service niet beschikbaar')
+          console.error('[useAi] Error response:', errData)
+          throw new Error(errData.error || `AI service niet beschikbaar (status ${response.status})`)
         }
 
         const data = await response.json()
@@ -74,7 +80,8 @@ export function useAi(projectId, sessionType) {
         setLoading(false)
         return data.message
       } catch (err) {
-        setError(err.message)
+        console.error('[useAi] Error:', err)
+        setError(err.message || 'Onbekende fout bij AI-aanroep')
         setLoading(false)
         return null
       }
