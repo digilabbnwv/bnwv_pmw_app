@@ -5,30 +5,35 @@ export function useNotifications() {
   const [items, setItems] = useState([])
   const [loading, setLoading] = useState(true)
 
-  const fetchNotifications = useCallback(async () => {
-    const { data: { user } } = await supabase.auth.getUser()
-    if (!user) return
-
-    const { data } = await supabase
-      .from('notifications')
-      .select('*')
-      .eq('user_id', user.id)
-      .order('created_at', { ascending: false })
-      .limit(20)
-
-    setItems(data || [])
-    setLoading(false)
-  }, [])
-
   useEffect(() => {
+    let cancelled = false
+
+    const fetchNotifications = async () => {
+      const { data: { user } } = await supabase.auth.getUser()
+      if (!user || cancelled) return
+
+      const { data } = await supabase
+        .from('notifications')
+        .select('*')
+        .eq('user_id', user.id)
+        .order('created_at', { ascending: false })
+        .limit(20)
+
+      if (!cancelled) {
+        setItems(data || [])
+        setLoading(false)
+      }
+    }
+
     fetchNotifications()
 
     // Subscribe to realtime notifications
+    let channel = null
     const setupSubscription = async () => {
       const { data: { user } } = await supabase.auth.getUser()
-      if (!user) return
+      if (!user || cancelled) return
 
-      const channel = supabase
+      channel = supabase
         .channel('notifications')
         .on(
           'postgres_changes',
@@ -43,17 +48,15 @@ export function useNotifications() {
           }
         )
         .subscribe()
-
-      return () => {
-        supabase.removeChannel(channel)
-      }
     }
 
-    const cleanup = setupSubscription()
+    setupSubscription()
+
     return () => {
-      cleanup.then((fn) => fn?.())
+      cancelled = true
+      if (channel) supabase.removeChannel(channel)
     }
-  }, [fetchNotifications])
+  }, [])
 
   const unreadCount = items.filter((n) => !n.read).length
 
@@ -87,6 +90,5 @@ export function useNotifications() {
     loading,
     markAsRead,
     markAllAsRead,
-    refetch: fetchNotifications,
   }
 }

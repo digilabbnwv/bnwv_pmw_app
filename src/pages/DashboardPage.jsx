@@ -9,7 +9,6 @@ import {
   Paper,
   Stack,
   ThemeIcon,
-  Badge,
 } from '@mantine/core'
 import { IconPlus, IconChecklist, IconRocket } from '@tabler/icons-react'
 import { useNavigate } from 'react-router-dom'

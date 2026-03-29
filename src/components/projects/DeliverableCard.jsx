@@ -9,16 +9,15 @@ import {
   ActionIcon,
   TextInput,
   Select,
-  Textarea,
   Modal,
   Anchor,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconPlus, IconTrash, IconExternalLink, IconEdit, IconSparkles } from '@tabler/icons-react'
+import { IconPlus, IconTrash, IconExternalLink, IconEdit } from '@tabler/icons-react'
 import { DELIVERABLE_TYPES, DELIVERABLE_STATUS_COLORS, getPhaseConfig } from '../../lib/utils/phaseConfig'
 import { formatDate } from '../../lib/utils/dateUtils'
 
-export default function DeliverableCard({ deliverables, phase, project, onAdd, onUpdate, onDelete }) {
+export default function DeliverableCard({ deliverables, phase, onAdd, onUpdate, onDelete }) {
   const [opened, { open, close }] = useDisclosure(false)
   const [editItem, setEditItem] = useState(null)
 

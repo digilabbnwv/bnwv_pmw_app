@@ -1,4 +1,4 @@
-import { useState, useCallback } from 'react'
+import { useState } from 'react'
 import {
   Title,
   Text,
@@ -10,7 +10,6 @@ import {
   Loader,
   Center,
   Grid,
-  Divider,
   Badge,
 } from '@mantine/core'
 import { notifications } from '@mantine/notifications'
@@ -20,7 +19,7 @@ import { supabase } from '../lib/supabaseClient'
 import { useProject } from '../lib/hooks/useProject'
 import { useActivityLog } from '../lib/hooks/useActivityLog'
 import { formatDate } from '../lib/utils/dateUtils'
-import { getPhaseLabel, getPhaseColor, getNextPhase, PHASES } from '../lib/utils/phaseConfig'
+import { getPhaseLabel, getPhaseColor, getNextPhase } from '../lib/utils/phaseConfig'
 import PhaseTimeline from '../components/projects/PhaseTimeline'
 import PhaseWorkspace from '../components/projects/PhaseWorkspace'
 import PhaseGate from '../components/projects/PhaseGate'
@@ -33,14 +32,14 @@ export default function ProjectDetailPage() {
   const navigate = useNavigate()
   const {
     project, setProject,
-    phases, setPhases,
+    phases,
     members, setMembers,
     profiles,
     deliverables, setDeliverables,
     tasks, setTasks,
     comments, setComments,
     indicators, setIndicators,
-    activity, setActivity,
+    activity,
     loading,
     refetch,
   } = useProject(id)
@@ -394,7 +393,6 @@ export default function ProjectDetailPage() {
             {project.current_phase !== 'afgerond' && (
               <PhaseWorkspace
                 phase={activePhase}
-                project={project}
                 deliverables={deliverables}
                 tasks={tasks}
                 comments={comments}

@@ -32,7 +32,14 @@
       "Bash(cmd.exe /c \"node_bin\\\\node.exe -e console.log\\(''test''\\)\")",
       "Bash(cmd /c \"node_bin\\\\node.exe -e \"\"console.log\\(''hello''\\)\"\"\")",
       "Bash(node_bin/node.exe -v)",
-      "Bash(git -c color.ui=never status)"
+      "Bash(git -c color.ui=never status)",
+      "Bash(node_bin/node.exe node_modules/eslint/bin/eslint.js src --ext .js,.jsx)",
+      "Bash(node_bin/node.exe node_modules/eslint/bin/eslint.js src --ext .js,.jsx --format json)",
+      "Bash(node_bin/node.exe -e \"console.log\\(require\\(''fs''\\).readFileSync\\(''lint-output.txt'',''utf8''\\)\\)\")",
+      "Bash(node_bin/node.exe node_modules/vite/bin/vite.js build)",
+      "Bash(node_bin/node.exe -e \"console.log\\(require\\(''fs''\\).readFileSync\\(''build-output.txt'',''utf8''\\)\\)\")",
+      "Bash(node_bin/node.exe node_modules/vitest/vitest.mjs run)",
+      "Bash(node_bin/node.exe -e \"console.log\\(require\\(''fs''\\).readFileSync\\(''test-output.txt'',''utf8''\\)\\)\")"
     ]
   }
 }

@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Paper, Title, Text, Timeline, ThemeIcon, Group } from '@mantine/core'
+import { Paper, Title, Text, Timeline, ThemeIcon } from '@mantine/core'
 import {
   IconArrowRight,
   IconFileText,

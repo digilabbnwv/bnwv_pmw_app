@@ -1,5 +1,5 @@
 import { isExpiringSoon } from './dateUtils'
-import { getPhaseColor as phaseColor, getPhaseLabel, getPhaseIndex, PHASES } from './phaseConfig'
+import { getPhaseColor as phaseColor, getPhaseLabel, PHASES } from './phaseConfig'
 
 const STATUS_COLORS = {
   'Niet gestart': 'gray',

@@ -1,8 +1,7 @@
-import { Stepper, Text, useMantineTheme } from '@mantine/core'
+import { Stepper, Text } from '@mantine/core'
 import { PHASES, getPhaseIndex } from '../../lib/utils/phaseConfig'
 
 export default function PhaseTimeline({ currentPhase, phases, selectedPhase, onSelectPhase }) {
-  const theme = useMantineTheme()
   const currentIndex = getPhaseIndex(currentPhase)
   const selectedIndex = getPhaseIndex(selectedPhase)
 

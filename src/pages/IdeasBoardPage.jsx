@@ -11,7 +11,6 @@ import {
   Center,
   Select,
   Badge,
-  ThemeIcon,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
 import { notifications } from '@mantine/notifications'
@@ -150,7 +149,7 @@ Formatteer als genummerde lijst. Wees creatief en praktisch.`
       let current = null
 
       for (const line of lines) {
-        const match = line.match(/^\d+[\.\)]\s*(.+)/)
+        const match = line.match(/^\d+[.)]\s*(.+)/)
         if (match) {
           if (current) ideaTexts.push(current)
           current = { title: match[1].replace(/\*\*/g, '').trim(), description: '' }

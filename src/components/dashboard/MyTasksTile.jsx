@@ -1,5 +1,5 @@
 import { useState, useEffect } from 'react'
-import { Paper, Title, Text, Stack, Group, Badge, Anchor } from '@mantine/core'
+import { Paper, Title, Text, Stack, Group, Badge } from '@mantine/core'
 import { useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
 import { TASK_STATUS_COLORS } from '../../lib/utils/phaseConfig'

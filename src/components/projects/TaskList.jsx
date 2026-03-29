@@ -25,7 +25,7 @@ const TASK_STATUS_OPTIONS = [
   { value: 'vervallen', label: 'Vervallen' },
 ]
 
-export default function TaskList({ tasks, phase, projectId, profiles, onAdd, onUpdate, onDelete }) {
+export default function TaskList({ tasks, phase, profiles, onAdd, onUpdate, onDelete }) {
   const [opened, { open, close }] = useDisclosure(false)
   const [editItem, setEditItem] = useState(null)
   const [form, setForm] = useState({

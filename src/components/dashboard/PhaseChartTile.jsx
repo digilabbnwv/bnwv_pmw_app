@@ -1,7 +1,7 @@
-import { Paper, Title, Text, Center } from '@mantine/core'
+import { Paper, Title, Text } from '@mantine/core'
 import { BarChart } from '@mantine/charts'
 import { countByPhase } from '../../lib/utils/projectUtils'
-import { PHASES, getPhaseColor } from '../../lib/utils/phaseConfig'
+import { PHASES } from '../../lib/utils/phaseConfig'
 
 export default function PhaseChartTile({ projects }) {
   const data = countByPhase(projects)

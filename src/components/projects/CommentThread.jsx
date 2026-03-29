@@ -3,7 +3,7 @@ import { Stack, Paper, Group, Text, Button, Textarea, Avatar } from '@mantine/co
 import { IconSend } from '@tabler/icons-react'
 import { formatDate } from '../../lib/utils/dateUtils'
 
-export default function CommentThread({ comments, phase, projectId, profiles, onAdd }) {
+export default function CommentThread({ comments, phase, profiles, onAdd }) {
   const [content, setContent] = useState('')
   const [sending, setSending] = useState(false)
 

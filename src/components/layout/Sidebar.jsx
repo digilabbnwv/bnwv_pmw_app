@@ -4,12 +4,10 @@ import {
   IconDashboard,
   IconFolders,
   IconSettings,
-  IconBell,
   IconFolder,
 } from '@tabler/icons-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
-import { useNotifications } from '../../lib/hooks/useNotifications'
 
 const navItems = [
   { label: 'Dashboard', icon: IconDashboard, path: '/' },
@@ -20,7 +18,6 @@ const navItems = [
 export default function Sidebar() {
   const location = useLocation()
   const navigate = useNavigate()
-  const { unreadCount } = useNotifications()
   const [recentProjects, setRecentProjects] = useState([])
   const [profile, setProfile] = useState(null)
 

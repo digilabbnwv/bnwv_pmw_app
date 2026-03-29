@@ -1,4 +1,4 @@
-import { Tabs, Text, Badge, Group, Stack, Paper, ThemeIcon, rem } from '@mantine/core'
+import { Tabs, Text, Badge, Group, Stack, Paper, ThemeIcon } from '@mantine/core'
 import {
   IconFileText,
   IconChecklist,
@@ -12,7 +12,6 @@ import CommentThread from './CommentThread'
 
 export default function PhaseWorkspace({
   phase,
-  project,
   deliverables,
   tasks,
   comments,
@@ -112,7 +111,6 @@ export default function PhaseWorkspace({
         <DeliverableCard
           deliverables={phaseDeliverables}
           phase={phase}
-          project={project}
           onAdd={onAddDeliverable}
           onUpdate={onUpdateDeliverable}
           onDelete={onDeleteDeliverable}
@@ -123,7 +121,6 @@ export default function PhaseWorkspace({
         <TaskList
           tasks={phaseTasks}
           phase={phase}
-          projectId={project.id}
           profiles={profiles}
           onAdd={onAddTask}
           onUpdate={onUpdateTask}
@@ -135,7 +132,6 @@ export default function PhaseWorkspace({
         <CommentThread
           comments={phaseComments}
           phase={phase}
-          projectId={project.id}
           profiles={profiles}
           onAdd={onAddComment}
         />

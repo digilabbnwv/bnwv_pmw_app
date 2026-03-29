@@ -69,7 +69,7 @@ export default function StartnotitieWizard({ project, onComplete }) {
   const [answers, setAnswers] = useState(STEPS.reduce((acc, s) => ({ ...acc, [s.key]: '' }), {}))
   const [aiResponse, setAiResponse] = useState(null)
   const [generatedDoc, setGeneratedDoc] = useState(null)
-  const { messages, loading, error, sendMessage } = useAi(project.id, 'startnotitie')
+  const { loading, error, sendMessage } = useAi(project.id, 'startnotitie')
 
   const currentStep = STEPS[active]
 
