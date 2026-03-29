@@ -109,7 +109,7 @@ function AiChat({ project, sessionType, placeholder }) {
           <Textarea
             placeholder="Schrijf je bericht... (Ctrl+Enter om te versturen)"
             value={input}
-            onChange={(e) => setInput(e?.currentTarget?.value ?? '')}
+            onChange={(e) => setInput(e.currentTarget.value)}
             onKeyDown={handleKeyDown}
             style={{ flex: 1 }}
             rows={2}

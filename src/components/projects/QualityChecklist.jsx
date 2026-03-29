@@ -49,7 +49,7 @@ export default function QualityChecklist({ qualityCheck, onUpdate }) {
             <TextInput
               placeholder={`URL naar ${item.label.toLowerCase()}`}
               value={qualityCheck[`${item.key}_url`] || ''}
-              onChange={(e) => handleUrlChange(item.key, e?.currentTarget?.value ?? '')}
+              onChange={(e) => handleUrlChange(item.key, e.currentTarget.value)}
               size="xs"
               mt={4}
             />
