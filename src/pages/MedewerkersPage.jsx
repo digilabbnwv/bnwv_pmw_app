@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback } from 'react'
+import { useState, useEffect, useReducer } from 'react'
 import {
   Title,
   Group,
@@ -32,21 +32,23 @@ export default function MedewerkersPage() {
   const [editProfile, setEditProfile] = useState(null)
   const [opened, { open, close }] = useDisclosure(false)
 
-  const fetchProfiles = useCallback(async () => {
-    const { data, error } = await supabase
-      .from('profiles')
-      .select('*')
-      .order('full_name', { ascending: true })
-
-    if (!error) {
-      setProfiles(data || [])
-    }
-    setLoading(false)
-  }, [])
+  // Counter om een refetch te triggeren vanuit event handlers
+  const [fetchTrigger, triggerRefetch] = useReducer((x) => x + 1, 0)
 
   useEffect(() => {
-    fetchProfiles()
-  }, [fetchProfiles])
+    const load = async () => {
+      const { data, error } = await supabase
+        .from('profiles')
+        .select('*')
+        .order('full_name', { ascending: true })
+
+      if (!error) {
+        setProfiles(data || [])
+      }
+      setLoading(false)
+    }
+    load()
+  }, [fetchTrigger])
 
   const handleOpenNew = () => {
     setEditProfile(null)
@@ -81,7 +83,7 @@ export default function MedewerkersPage() {
       } else {
         notifications.show({ title: 'Opgeslagen', message: 'Medewerker bijgewerkt.', color: 'green' })
         close()
-        fetchProfiles()
+        triggerRefetch()
       }
     } else {
       // Nieuwe medewerker: invite via Edge Function
@@ -112,7 +114,7 @@ export default function MedewerkersPage() {
             color: 'green',
           })
           close()
-          fetchProfiles()
+          triggerRefetch()
         }
       } catch (err) {
         setSaving(false)
@@ -148,7 +150,7 @@ export default function MedewerkersPage() {
         notifications.show({ title: 'Fout', message: result.error || 'Verwijderen mislukt.', color: 'red' })
       } else {
         notifications.show({ title: 'Verwijderd', message: `${profile.full_name} is verwijderd.`, color: 'green' })
-        fetchProfiles()
+        triggerRefetch()
       }
     } catch {
       notifications.show({ title: 'Fout', message: 'Kon geen verbinding maken met de server.', color: 'red' })
