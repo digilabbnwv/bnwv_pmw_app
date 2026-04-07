@@ -20,3 +20,6 @@ npm-debug.log*
 *.njsproj
 *.sln
 *.sw?
+
+# Brand resources (large files)
+public/resources/

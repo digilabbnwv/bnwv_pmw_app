@@ -33,7 +33,7 @@ export default function MyTasksTile() {
   }
 
   return (
-    <Paper withBorder p="md" radius="md">
+    <Paper withBorder p="md" radius="md" style={{ borderLeft: '3px solid var(--mantine-color-doe-5)' }}>
       <Title order={4} mb="sm">Mijn taken</Title>
 
       {tasks.length === 0 ? (

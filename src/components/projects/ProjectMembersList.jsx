@@ -23,7 +23,7 @@ export default function ProjectMembersList({ members, profiles, onAdd, onRemove 
   )
 
   return (
-    <Paper withBorder p="md" radius="md">
+    <Paper withBorder p="md" radius="md" style={{ borderLeft: '3px solid var(--mantine-color-ontmoet-5)' }}>
       <Title order={5} mb="sm">
         Projectgroepleden
       </Title>

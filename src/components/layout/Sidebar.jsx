@@ -94,7 +94,7 @@ export default function Sidebar() {
       </div>
 
       {profile && (
-        <Box p="sm" style={{ borderTop: '1px solid var(--mantine-color-gray-3)' }}>
+        <Box p="sm" style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}>
           <Group gap="sm">
             <Avatar radius="xl" size="sm" color="brand">
               {getInitials(profile.full_name)}

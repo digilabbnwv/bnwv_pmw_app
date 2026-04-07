@@ -8,7 +8,7 @@ export default function DocumentsTile({ projects }) {
   const expiring = getExpiringProjects(projects)
 
   return (
-    <Paper withBorder p="md" radius="md">
+    <Paper withBorder p="md" radius="md" style={{ borderLeft: '3px solid var(--mantine-color-lees-5)' }}>
       <Title order={4} mb="sm">
         Documenten bijna verlopen
       </Title>

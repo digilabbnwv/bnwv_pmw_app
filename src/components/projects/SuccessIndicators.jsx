@@ -83,7 +83,7 @@ export default function SuccessIndicators({ indicators, onAdd, onUpdate, onDelet
 
   return (
     <>
-      <Paper p="md" radius="md" withBorder>
+      <Paper p="md" radius="md" withBorder style={{ borderLeft: '3px solid var(--mantine-color-vraag-5)' }}>
         <Group justify="space-between" mb="md">
           <Group gap="sm">
             <IconTarget size={20} />

@@ -15,7 +15,9 @@ export default function ProjectCard({ project }) {
       withBorder
       p="md"
       radius="md"
-      style={{ cursor: 'pointer', transition: 'box-shadow 0.2s' }}
+      style={{ cursor: 'pointer', transition: 'box-shadow 0.15s ease, transform 0.15s ease' }}
+      onMouseEnter={(e) => { e.currentTarget.style.boxShadow = 'var(--mantine-shadow-sm)'; e.currentTarget.style.transform = 'translateY(-1px)'; }}
+      onMouseLeave={(e) => { e.currentTarget.style.boxShadow = 'none'; e.currentTarget.style.transform = 'none'; }}
       onClick={() => navigate(`/projects/${project.id}`)}
       className="project-card"
     >

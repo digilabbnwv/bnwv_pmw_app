@@ -352,7 +352,7 @@ export default function ProjectDetailPage() {
       </Group>
 
       {project.description && (
-        <Paper withBorder p="md" radius="md">
+        <Paper p="lg" radius="md" style={{ backgroundColor: 'light-dark(var(--mantine-color-beige-1), var(--mantine-color-dark-7))' }}>
           <Text size="sm">{project.description}</Text>
         </Paper>
       )}
@@ -375,7 +375,7 @@ export default function ProjectDetailPage() {
 
       {/* Phase Timeline */}
       {project.current_phase !== 'afgerond' && (
-        <Paper withBorder p="md" radius="md">
+        <Paper p="lg" radius="md" style={{ backgroundColor: 'light-dark(var(--mantine-color-beige-1), var(--mantine-color-dark-7))' }}>
           <PhaseTimeline
             currentPhase={project.current_phase}
             phases={phases}
@@ -386,7 +386,7 @@ export default function ProjectDetailPage() {
       )}
 
       {/* Main content */}
-      <Grid gutter="lg">
+      <Grid gutter="xl">
         <Grid.Col span={{ base: 12, lg: 8 }}>
           <Stack gap="lg">
             {/* Phase Workspace */}
