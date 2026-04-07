@@ -200,7 +200,9 @@ export default function MedewerkersPage() {
       return
     }
 
-    const { error } = await supabase.auth.resetPasswordForEmail(profile.email)
+    const { error } = await supabase.auth.resetPasswordForEmail(profile.email, {
+      redirectTo: `${window.location.origin}/bnwv_pmw_app/login`,
+    })
 
     if (error) {
       notifications.show({ title: 'Fout', message: error.message, color: 'red' })

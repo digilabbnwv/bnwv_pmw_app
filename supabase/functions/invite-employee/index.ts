@@ -75,7 +75,7 @@ serve(async (req) => {
         email,
         {
           data: { voornaam, tussenvoegsel, achternaam, avatar_id, role: role || 'projectlid' },
-          redirectTo: `${supabaseUrl.replace('.supabase.co', '.supabase.co')}/auth/v1/callback`,
+          redirectTo: 'https://digilabbnwv.github.io/bnwv_pmw_app/login',
         }
       )
 
