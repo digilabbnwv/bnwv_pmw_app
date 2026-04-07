@@ -26,7 +26,7 @@ const ACTION_CONFIG = {
 export default function ActivityFeed({ activity, profiles }) {
   if (!activity || activity.length === 0) {
     return (
-      <Paper p="md" radius="md" withBorder>
+      <Paper p="md" radius="md" withBorder style={{ borderLeft: '3px solid var(--mantine-color-brand-5)' }}>
         <Title order={5} mb="sm">Recente activiteit</Title>
         <Text c="dimmed" size="sm">Nog geen activiteit geregistreerd.</Text>
       </Paper>
@@ -34,7 +34,7 @@ export default function ActivityFeed({ activity, profiles }) {
   }
 
   return (
-    <Paper p="md" radius="md" withBorder>
+    <Paper p="md" radius="md" withBorder style={{ borderLeft: '3px solid var(--mantine-color-brand-5)' }}>
       <Title order={5} mb="md">Recente activiteit</Title>
       <Timeline active={-1} bulletSize={28} lineWidth={2}>
         {activity.slice(0, 10).map((item) => {

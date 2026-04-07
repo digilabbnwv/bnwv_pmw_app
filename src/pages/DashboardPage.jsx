@@ -66,7 +66,7 @@ export default function DashboardPage() {
   return (
     <Stack gap="lg">
       {/* Welcome header */}
-      <Paper p="lg" radius="md" withBorder>
+      <Paper p="xl" radius="md" style={{ backgroundColor: 'light-dark(var(--mantine-color-beige-1), var(--mantine-color-dark-7))' }}>
         <Group justify="space-between" wrap="wrap">
           <div>
             <Group gap="sm" mb={4}>
@@ -100,7 +100,7 @@ export default function DashboardPage() {
       </Paper>
 
       {/* Main grid */}
-      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="md">
+      <SimpleGrid cols={{ base: 1, md: 2 }} spacing="lg">
         <ActiveProjectsTile projects={projects} />
         <MyTasksTile />
         <PhaseChartTile projects={projects} />

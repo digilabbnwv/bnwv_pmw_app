@@ -42,7 +42,7 @@ export default function RecentActivityTile() {
   }, [])
 
   return (
-    <Paper withBorder p="md" radius="md">
+    <Paper withBorder p="md" radius="md" style={{ borderLeft: '3px solid var(--mantine-color-brand-5)' }}>
       <Title order={4} mb="sm">Recente activiteit</Title>
 
       {activity.length === 0 ? (
