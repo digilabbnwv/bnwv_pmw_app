@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useEffect } from 'react'
 import {
   Container,
   Paper,
@@ -30,6 +30,14 @@ export default function LoginPage() {
   const [totpCode, setTotpCode] = useState('')
   const [factorId, setFactorId] = useState(null)
   const navigate = useNavigate()
+
+  // Detect recovery tokens in the URL hash (from Supabase password reset emails)
+  useEffect(() => {
+    const hash = window.location.hash
+    if (hash && hash.includes('type=recovery')) {
+      navigate('/reset-password' + hash, { replace: true })
+    }
+  }, [navigate])
 
   const handleLogin = async (e) => {
     e.preventDefault()

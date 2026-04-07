@@ -11,6 +11,7 @@ import AiAssistantPage from './pages/AiAssistantPage'
 import IdeasBoardPage from './pages/IdeasBoardPage'
 import MedewerkersPage from './pages/MedewerkersPage'
 import SettingsPage from './pages/SettingsPage'
+import ResetPasswordPage from './pages/ResetPasswordPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import AppShellLayout from './components/layout/AppShell'
 
@@ -21,6 +22,7 @@ function App() {
       <ModalsProvider>
         <Routes>
           <Route path="/login" element={<LoginPage />} />
+          <Route path="/reset-password" element={<ResetPasswordPage />} />
           <Route path="/setup-totp" element={<SetupTOTPPage />} />
           <Route
             path="/*"

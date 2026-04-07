@@ -75,7 +75,7 @@ serve(async (req) => {
         email,
         {
           data: { voornaam, tussenvoegsel, achternaam, avatar_id, role: role || 'projectlid' },
-          redirectTo: 'https://digilabbnwv.github.io/bnwv_pmw_app/login',
+          redirectTo: 'https://digilabbnwv.github.io/bnwv_pmw_app/reset-password',
         }
       )
 

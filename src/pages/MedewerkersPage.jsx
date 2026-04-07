@@ -201,7 +201,7 @@ export default function MedewerkersPage() {
     }
 
     const { error } = await supabase.auth.resetPasswordForEmail(profile.email, {
-      redirectTo: `${window.location.origin}/bnwv_pmw_app/login`,
+      redirectTo: `${window.location.origin}/bnwv_pmw_app/reset-password`,
     })
 
     if (error) {
