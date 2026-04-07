@@ -1,6 +1,7 @@
-import { Paper, Group, Text, Badge, ActionIcon, Select, Avatar, Tooltip } from '@mantine/core'
+import { Paper, Group, Text, Badge, ActionIcon, Select } from '@mantine/core'
 import { IconEdit, IconTrash } from '@tabler/icons-react'
 import { formatDate } from '../../lib/utils/dateUtils'
+import EmployeeAvatar from '../common/EmployeeAvatar'
 
 const CATEGORY_COLORS = {
   marketing: 'pink',
@@ -30,11 +31,6 @@ const STATUS_OPTIONS = [
 
 export default function IdeaCard({ idea, profiles, onUpdate, onDelete, onEdit }) {
   const assignee = profiles.find((p) => p.id === idea.assigned_to)
-
-  const getInitials = (name) => {
-    if (!name) return '?'
-    return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
-  }
 
   return (
     <Paper p="sm" radius="md" withBorder>
@@ -71,11 +67,7 @@ export default function IdeaCard({ idea, profiles, onUpdate, onDelete, onEdit })
         />
         <Group gap="xs">
           {assignee && (
-            <Tooltip label={assignee.full_name}>
-              <Avatar radius="xl" size="xs" color="brand">
-                {getInitials(assignee.full_name)}
-              </Avatar>
-            </Tooltip>
+            <EmployeeAvatar profile={assignee} size="xs" showTooltip />
           )}
           {idea.target_date && (
             <Text size="xs" c="dimmed">{formatDate(idea.target_date)}</Text>

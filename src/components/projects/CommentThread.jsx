@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Stack, Paper, Group, Text, Button, Textarea, Avatar } from '@mantine/core'
+import { Stack, Paper, Group, Text, Button, Textarea } from '@mantine/core'
 import { IconSend } from '@tabler/icons-react'
 import { formatDate } from '../../lib/utils/dateUtils'
+import EmployeeAvatar from '../common/EmployeeAvatar'
 
 export default function CommentThread({ comments, phase, profiles, onAdd }) {
   const [content, setContent] = useState('')
@@ -21,16 +22,6 @@ export default function CommentThread({ comments, phase, profiles, onAdd }) {
     }
   }
 
-  const getInitials = (name) => {
-    if (!name) return '?'
-    return name
-      .split(' ')
-      .map((n) => n[0])
-      .join('')
-      .toUpperCase()
-      .slice(0, 2)
-  }
-
   return (
     <Stack gap="md">
       {comments.length === 0 ? (
@@ -43,9 +34,7 @@ export default function CommentThread({ comments, phase, profiles, onAdd }) {
           return (
             <Paper key={comment.id} p="sm" radius="md" withBorder>
               <Group gap="sm" align="flex-start">
-                <Avatar radius="xl" size="sm" color="brand">
-                  {getInitials(author?.full_name)}
-                </Avatar>
+                <EmployeeAvatar profile={author} size="sm" />
                 <div style={{ flex: 1 }}>
                   <Group gap="xs" mb={2}>
                     <Text size="sm" fw={600}>{author?.full_name || 'Onbekend'}</Text>

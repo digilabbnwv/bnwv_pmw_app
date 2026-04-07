@@ -9,6 +9,7 @@ import ProjectDetailPage from './pages/ProjectDetailPage'
 import ProjectFormPage from './pages/ProjectFormPage'
 import AiAssistantPage from './pages/AiAssistantPage'
 import IdeasBoardPage from './pages/IdeasBoardPage'
+import MedewerkersPage from './pages/MedewerkersPage'
 import SettingsPage from './pages/SettingsPage'
 import ProtectedRoute from './components/ProtectedRoute'
 import AppShellLayout from './components/layout/AppShell'
@@ -34,6 +35,7 @@ function App() {
                     <Route path="/projects/:id/edit" element={<ProjectFormPage />} />
                     <Route path="/projects/:id/ai" element={<AiAssistantPage />} />
                     <Route path="/projects/:id/ideas" element={<IdeasBoardPage />} />
+                    <Route path="/medewerkers" element={<MedewerkersPage />} />
                     <Route path="/settings" element={<SettingsPage />} />
                     <Route path="*" element={<Navigate to="/" replace />} />
                   </Routes>

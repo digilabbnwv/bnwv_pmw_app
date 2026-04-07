@@ -1,7 +1,8 @@
 import { useState } from 'react'
-import { Paper, Title, Stack, Group, Text, ActionIcon, Button, Avatar, Badge } from '@mantine/core'
+import { Paper, Title, Stack, Group, Text, ActionIcon, Button, Badge } from '@mantine/core'
 import { IconTrash, IconPlus } from '@tabler/icons-react'
 import ProfileSelect from '../common/ProfileSelect'
+import EmployeeAvatar from '../common/EmployeeAvatar'
 
 export default function ProjectMembersList({ members, profiles, onAdd, onRemove }) {
   const [selectedId, setSelectedId] = useState(null)
@@ -11,11 +12,6 @@ export default function ProjectMembersList({ members, profiles, onAdd, onRemove 
       onAdd(selectedId)
       setSelectedId(null)
     }
-  }
-
-  const getInitials = (name) => {
-    if (!name) return '?'
-    return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
   }
 
   const availableProfiles = profiles.filter(
@@ -39,9 +35,7 @@ export default function ProjectMembersList({ members, profiles, onAdd, onRemove 
             return (
               <Group key={member.id} justify="space-between" wrap="nowrap">
                 <Group gap="sm">
-                  <Avatar radius="xl" size="sm" color="brand">
-                    {getInitials(profile?.full_name)}
-                  </Avatar>
+                  <EmployeeAvatar profile={profile} size="sm" />
                   <div>
                     <Text size="sm" fw={500}>
                       {profile?.full_name || 'Onbekend'}
