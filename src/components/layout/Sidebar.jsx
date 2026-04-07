@@ -1,17 +1,20 @@
 import { useState, useEffect } from 'react'
-import { NavLink, Stack, Divider, Text, Group, Avatar, Badge, Box } from '@mantine/core'
+import { NavLink, Stack, Divider, Text, Group, Badge, Box } from '@mantine/core'
 import {
   IconDashboard,
   IconFolders,
+  IconUsers,
   IconSettings,
   IconFolder,
 } from '@tabler/icons-react'
 import { useLocation, useNavigate } from 'react-router-dom'
 import { supabase } from '../../lib/supabaseClient'
+import EmployeeAvatar from '../common/EmployeeAvatar'
 
 const navItems = [
   { label: 'Dashboard', icon: IconDashboard, path: '/' },
   { label: 'Alle Projecten', icon: IconFolders, path: '/projects' },
+  { label: 'Medewerkers', icon: IconUsers, path: '/medewerkers' },
   { label: 'Instellingen', icon: IconSettings, path: '/settings' },
 ]
 
@@ -40,11 +43,6 @@ export default function Sidebar() {
     }
     fetch()
   }, [])
-
-  const getInitials = (name) => {
-    if (!name) return '?'
-    return name.split(' ').map((n) => n[0]).join('').toUpperCase().slice(0, 2)
-  }
 
   const ROLE_LABELS = {
     projectleider: 'Projectleider',
@@ -96,9 +94,7 @@ export default function Sidebar() {
       {profile && (
         <Box p="sm" style={{ borderTop: '1px solid var(--mantine-color-default-border)' }}>
           <Group gap="sm">
-            <Avatar radius="xl" size="sm" color="brand">
-              {getInitials(profile.full_name)}
-            </Avatar>
+            <EmployeeAvatar profile={profile} size="sm" />
             <div style={{ flex: 1, minWidth: 0 }}>
               <Text size="sm" fw={500} lineClamp={1}>
                 {profile.full_name || 'Gebruiker'}
