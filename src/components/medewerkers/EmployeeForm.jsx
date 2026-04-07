@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useMemo } from 'react'
 import { Modal, Stack, Group, TextInput, Select, Button } from '@mantine/core'
 import AvatarPicker from './AvatarPicker'
 
@@ -8,40 +8,41 @@ const ROLE_OPTIONS = [
   { value: 'manager', label: 'Manager' },
 ]
 
+const EMPTY_FORM = {
+  voornaam: '',
+  tussenvoegsel: '',
+  achternaam: '',
+  email: '',
+  role: 'projectlid',
+  avatar_id: '',
+}
+
 /**
  * Modal formulier voor het aanmaken of bewerken van een medewerker.
  */
 export default function EmployeeForm({ opened, onClose, onSubmit, editProfile, loading }) {
-  const [form, setForm] = useState({
-    voornaam: '',
-    tussenvoegsel: '',
-    achternaam: '',
-    email: '',
-    role: 'projectlid',
-    avatar_id: '',
-  })
-
-  useEffect(() => {
-    if (editProfile) {
-      setForm({
-        voornaam: editProfile.voornaam || '',
-        tussenvoegsel: editProfile.tussenvoegsel || '',
-        achternaam: editProfile.achternaam || '',
-        email: editProfile.email || '',
-        role: editProfile.role || 'projectlid',
-        avatar_id: editProfile.avatar_id || '',
-      })
-    } else {
-      setForm({
-        voornaam: '',
-        tussenvoegsel: '',
-        achternaam: '',
-        email: '',
-        role: 'projectlid',
-        avatar_id: '',
-      })
+  const initialForm = useMemo(() => {
+    if (!editProfile) return EMPTY_FORM
+    return {
+      voornaam: editProfile.voornaam || '',
+      tussenvoegsel: editProfile.tussenvoegsel || '',
+      achternaam: editProfile.achternaam || '',
+      email: editProfile.email || '',
+      role: editProfile.role || 'projectlid',
+      avatar_id: editProfile.avatar_id || '',
     }
-  }, [editProfile, opened])
+  }, [editProfile])
+
+  const [form, setForm] = useState(EMPTY_FORM)
+
+  // Reset form wanneer modal opent (via key prop zou ook kunnen, maar dit is expliciet)
+  const [prevOpened, setPrevOpened] = useState(false)
+  if (opened && !prevOpened) {
+    setForm(initialForm)
+  }
+  if (opened !== prevOpened) {
+    setPrevOpened(opened)
+  }
 
   const handleSubmit = () => {
     if (!form.voornaam.trim() || !form.achternaam.trim() || !form.email.trim()) return

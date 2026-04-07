@@ -1,4 +1,4 @@
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useCallback } from 'react'
 import {
   Title,
   Group,
@@ -32,7 +32,7 @@ export default function MedewerkersPage() {
   const [editProfile, setEditProfile] = useState(null)
   const [opened, { open, close }] = useDisclosure(false)
 
-  const fetchProfiles = async () => {
+  const fetchProfiles = useCallback(async () => {
     const { data, error } = await supabase
       .from('profiles')
       .select('*')
@@ -42,11 +42,11 @@ export default function MedewerkersPage() {
       setProfiles(data || [])
     }
     setLoading(false)
-  }
+  }, [])
 
   useEffect(() => {
     fetchProfiles()
-  }, [])
+  }, [fetchProfiles])
 
   const handleOpenNew = () => {
     setEditProfile(null)
