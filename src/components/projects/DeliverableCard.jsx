@@ -8,10 +8,12 @@ import {
   Button,
   ActionIcon,
   TextInput,
+  Textarea,
   Select,
   Modal,
   Anchor,
   ScrollArea,
+  SegmentedControl,
   TypographyStylesProvider,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
@@ -24,11 +26,22 @@ export default function DeliverableCard({ deliverables, phase, onAdd, onUpdate, 
   const [opened, { open, close }] = useDisclosure(false)
   const [viewOpened, { open: openView, close: closeView }] = useDisclosure(false)
   const [viewItem, setViewItem] = useState(null)
+  const [viewMode, setViewMode] = useState('weergave')
+  const [editedText, setEditedText] = useState('')
   const [editItem, setEditItem] = useState(null)
 
   const handleView = (item) => {
     setViewItem(item)
+    setEditedText(item.content?.text || '')
+    setViewMode('weergave')
     openView()
+  }
+
+  const handleSaveContent = () => {
+    const updated = { ...viewItem, content: { ...viewItem.content, text: editedText } }
+    onUpdate(updated)
+    setViewItem(updated)
+    setViewMode('weergave')
   }
 
   const config = getPhaseConfig(phase)
@@ -145,11 +158,42 @@ export default function DeliverableCard({ deliverables, phase, onAdd, onUpdate, 
         size="xl"
         centered
       >
-        <ScrollArea h={600} offsetScrollbars>
-          <TypographyStylesProvider>
-            <ReactMarkdown>{viewItem?.content?.text || ''}</ReactMarkdown>
-          </TypographyStylesProvider>
-        </ScrollArea>
+        <Stack gap="sm">
+          <Group justify="space-between">
+            <SegmentedControl
+              size="xs"
+              value={viewMode}
+              onChange={setViewMode}
+              data={[
+                { label: 'Weergave', value: 'weergave' },
+                { label: 'Bewerken', value: 'bewerken' },
+              ]}
+            />
+            {viewMode === 'bewerken' && (
+              <Group gap="xs">
+                <Button size="xs" variant="default" onClick={() => setViewMode('weergave')}>Annuleren</Button>
+                <Button size="xs" onClick={handleSaveContent}>Opslaan</Button>
+              </Group>
+            )}
+          </Group>
+
+          {viewMode === 'weergave' ? (
+            <ScrollArea h={560} offsetScrollbars>
+              <TypographyStylesProvider>
+                <ReactMarkdown>{editedText}</ReactMarkdown>
+              </TypographyStylesProvider>
+            </ScrollArea>
+          ) : (
+            <Textarea
+              autosize
+              minRows={20}
+              maxRows={30}
+              value={editedText}
+              onChange={(e) => setEditedText(e.currentTarget.value)}
+              styles={{ input: { fontFamily: 'monospace', fontSize: 13 } }}
+            />
+          )}
+        </Stack>
       </Modal>
 
       <Modal opened={opened} onClose={close} title={editItem ? 'Document bewerken' : 'Nieuw document'} centered>

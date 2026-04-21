@@ -75,6 +75,7 @@ export default function ProjectDetailPage() {
         type: item.type,
         status: item.status,
         sharepoint_url: item.sharepoint_url,
+        ...(item.content !== undefined && { content: item.content }),
         updated_at: new Date().toISOString(),
       })
       .eq('id', item.id)
