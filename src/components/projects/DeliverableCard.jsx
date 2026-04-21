@@ -11,15 +11,25 @@ import {
   Select,
   Modal,
   Anchor,
+  ScrollArea,
+  TypographyStylesProvider,
 } from '@mantine/core'
 import { useDisclosure } from '@mantine/hooks'
-import { IconPlus, IconTrash, IconExternalLink, IconEdit } from '@tabler/icons-react'
+import { IconPlus, IconTrash, IconExternalLink, IconEdit, IconEye } from '@tabler/icons-react'
+import ReactMarkdown from 'react-markdown'
 import { DELIVERABLE_TYPES, DELIVERABLE_STATUS_COLORS, getPhaseConfig } from '../../lib/utils/phaseConfig'
 import { formatDate } from '../../lib/utils/dateUtils'
 
 export default function DeliverableCard({ deliverables, phase, onAdd, onUpdate, onDelete }) {
   const [opened, { open, close }] = useDisclosure(false)
+  const [viewOpened, { open: openView, close: closeView }] = useDisclosure(false)
+  const [viewItem, setViewItem] = useState(null)
   const [editItem, setEditItem] = useState(null)
+
+  const handleView = (item) => {
+    setViewItem(item)
+    openView()
+  }
 
   const config = getPhaseConfig(phase)
   const availableTypes = Object.entries(DELIVERABLE_TYPES).map(([value, label]) => ({ value, label }))
@@ -99,6 +109,11 @@ export default function DeliverableCard({ deliverables, phase, onAdd, onUpdate, 
                   </Group>
                 </div>
                 <Group gap="xs">
+                  {item.content?.text && (
+                    <ActionIcon variant="subtle" color="blue" onClick={() => handleView(item)}>
+                      <IconEye size={16} />
+                    </ActionIcon>
+                  )}
                   <ActionIcon variant="subtle" onClick={() => handleOpen(item)}>
                     <IconEdit size={16} />
                   </ActionIcon>
@@ -122,6 +137,20 @@ export default function DeliverableCard({ deliverables, phase, onAdd, onUpdate, 
           </Button>
         </Group>
       </Stack>
+
+      <Modal
+        opened={viewOpened}
+        onClose={closeView}
+        title={viewItem?.title}
+        size="xl"
+        centered
+      >
+        <ScrollArea h={600} offsetScrollbars>
+          <TypographyStylesProvider>
+            <ReactMarkdown>{viewItem?.content?.text || ''}</ReactMarkdown>
+          </TypographyStylesProvider>
+        </ScrollArea>
+      </Modal>
 
       <Modal opened={opened} onClose={close} title={editItem ? 'Document bewerken' : 'Nieuw document'} centered>
         <Stack gap="md">
