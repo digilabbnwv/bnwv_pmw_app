@@ -8,6 +8,7 @@ import {
   Alert,
   Stack,
   Text,
+  PinInput,
 } from '@mantine/core'
 import { IconAlertCircle, IconCheck } from '@tabler/icons-react'
 import { supabase } from '../lib/supabaseClient'
@@ -20,26 +21,74 @@ export default function ResetPasswordPage() {
   const [success, setSuccess] = useState(false)
   const [loading, setLoading] = useState(false)
   const [sessionReady, setSessionReady] = useState(false)
+  const [mfaRequired, setMfaRequired] = useState(false)
+  const [mfaVerified, setMfaVerified] = useState(false)
+  const [totpCode, setTotpCode] = useState('')
+  const [factorId, setFactorId] = useState(null)
   const navigate = useNavigate()
 
+  const checkMfaRequirement = async () => {
+    const { data: aal } = await supabase.auth.mfa.getAuthenticatorAssuranceLevel()
+    if (aal?.nextLevel === 'aal2' && aal?.currentLevel !== 'aal2') {
+      const { data: factors } = await supabase.auth.mfa.listFactors()
+      const totpFactors = factors?.totp || []
+      if (totpFactors.length > 0) {
+        setFactorId(totpFactors[0].id)
+        setMfaRequired(true)
+        return
+      }
+    }
+    setMfaVerified(true)
+  }
+
   useEffect(() => {
-    // Supabase automatically picks up the tokens from the URL hash
-    // and establishes a session. We listen for the PASSWORD_RECOVERY event.
     const { data: { subscription } } = supabase.auth.onAuthStateChange((event) => {
       if (event === 'PASSWORD_RECOVERY') {
         setSessionReady(true)
+        checkMfaRequirement()
       }
     })
 
-    // Also check if there's already an active session (tokens already consumed)
     supabase.auth.getSession().then(({ data: { session } }) => {
       if (session) {
         setSessionReady(true)
+        checkMfaRequirement()
       }
     })
 
     return () => subscription.unsubscribe()
   }, [])
+
+  const handleTotp = async (code) => {
+    setError('')
+    setLoading(true)
+
+    const { data: challenge, error: challengeError } =
+      await supabase.auth.mfa.challenge({ factorId })
+
+    if (challengeError) {
+      setError('MFA verificatie mislukt. Probeer opnieuw.')
+      setLoading(false)
+      return
+    }
+
+    const { error: verifyError } = await supabase.auth.mfa.verify({
+      factorId,
+      challengeId: challenge.id,
+      code,
+    })
+
+    setLoading(false)
+
+    if (verifyError) {
+      setError('De code is onjuist of verlopen. Probeer opnieuw.')
+      setTotpCode('')
+      return
+    }
+
+    setMfaVerified(true)
+    setMfaRequired(false)
+  }
 
   const handleSubmit = async (e) => {
     e.preventDefault()
@@ -95,6 +144,31 @@ export default function ResetPasswordPage() {
           <Text ta="center" c="dimmed">
             Sessie laden...
           </Text>
+        ) : mfaRequired && !mfaVerified ? (
+          <Stack>
+            <Text size="sm" ta="center">
+              Voer de 6-cijferige code in van je authenticator app om door te gaan.
+            </Text>
+            <PinInput
+              length={6}
+              type="number"
+              oneTimeCode
+              value={totpCode}
+              onChange={(value) => {
+                setTotpCode(value)
+                if (value.length === 6) handleTotp(value)
+              }}
+              style={{ justifyContent: 'center' }}
+            />
+            <Button
+              fullWidth
+              loading={loading}
+              onClick={() => handleTotp(totpCode)}
+              disabled={totpCode.length !== 6}
+            >
+              Verifiëren
+            </Button>
+          </Stack>
         ) : (
           <form onSubmit={handleSubmit}>
             <Stack>
